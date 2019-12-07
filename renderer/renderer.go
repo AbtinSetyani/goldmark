@@ -6,8 +6,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/util"
 )
 
 // A Config struct is a data structure that holds configuration of the Renderer.
@@ -70,7 +70,7 @@ type SetOptioner interface {
 }
 
 // NodeRendererFunc is a function that renders a given node.
-type NodeRendererFunc func(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
+type NodeRendererFunc func(rs renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
 
 // A NodeRenderer interface offers NodeRendererFuncs.
 type NodeRenderer interface {

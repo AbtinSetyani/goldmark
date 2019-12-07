@@ -1,14 +1,27 @@
 goldmark
 ==========================================
 
-[![http://godoc.org/github.com/yuin/goldmark](https://godoc.org/github.com/yuin/goldmark?status.svg)](http://godoc.org/github.com/yuin/goldmark)
-[![https://github.com/yuin/goldmark/actions?query=workflow:test](https://github.com/yuin/goldmark/workflows/test/badge.svg?branch=master&event=push)](https://github.com/yuin/goldmark/actions?query=workflow:test)
+[![http://godoc.org/github.com/enkogu/goldmark](https://godoc.org/github.com/enkogu/goldmark?status.svg)](http://godoc.org/github.com/enkogu/goldmark)
+[![https://github.com/enkogu/goldmark/actions?query=workflow:test](https://github.com/enkogu/goldmark/workflows/test/badge.svg?branch=master&event=push)](https://github.com/enkogu/goldmark/actions?query=workflow:test)
 [![https://coveralls.io/github/yuin/goldmark](https://coveralls.io/repos/github/yuin/goldmark/badge.svg?branch=master)](https://coveralls.io/github/yuin/goldmark)
-[![https://goreportcard.com/report/github.com/yuin/goldmark](https://goreportcard.com/badge/github.com/yuin/goldmark)](https://goreportcard.com/report/github.com/yuin/goldmark)
+[![https://goreportcard.com/report/github.com/enkogu/goldmark](https://goreportcard.com/badge/github.com/enkogu/goldmark)](https://goreportcard.com/report/github.com/enkogu/goldmark)
 
 > A Markdown parser written in Go. Easy to extend, standard compliant, well structured.
 
 goldmark is compliant with CommonMark 0.29.
+
+TODO
+-------
+
+*  [ ] Переделать с пяток основных функций для рендеринга (их 21)
+*  [ ] Попробовать запустить, то есть на выходе получить список блоков
+*  [ ] Доделать остальные функции рендеринга
+*  [ ] То, что писалось рендерером в html атрибуты – надо подумать что и как с этим делать, разобрать все кейсы
+*  [ ] Опции парсера/рендерера – надо пощелкать и настроить так, как это должно работать
+*  [ ] Собрать и упаковать в один пакет вместе с JohannesKaufmann/html-to-markdown, вырезать всё лишнее
+*  [ ] Подключить к мидлу
+*  [ ] Тесты
+
 
 Anytype
 ---------
@@ -160,7 +173,7 @@ Features
 Installation
 ----------------------
 ```bash
-$ go get github.com/yuin/goldmark
+$ go get github.com/enkogu/goldmark
 ```
 
 
@@ -171,7 +184,7 @@ Import packages:
 ```
 import (
 	"bytes"
-	"github.com/yuin/goldmark"
+	"github.com/enkogu/goldmark"
 )
 ```
 
@@ -204,10 +217,10 @@ Custom parser and renderer
 ```go
 import (
 	"bytes"
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/extension"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer/html"
+	"github.com/enkogu/goldmark"
+	"github.com/enkogu/goldmark/extension"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer/html"
 )
 
 md := goldmark.New(
@@ -385,9 +398,9 @@ As you can see, goldmark performs pretty much equally to cmark.
 Extensions
 --------------------
 
-- [goldmark-meta](https://github.com/yuin/goldmark-meta): A YAML metadata
+- [goldmark-meta](https://github.com/enkogu/goldmark-meta): A YAML metadata
   extension for the goldmark Markdown parser.
-- [goldmark-highlighting](https://github.com/yuin/goldmark-highlighting): A Syntax highlighting extension
+- [goldmark-highlighting](https://github.com/enkogu/goldmark-highlighting): A Syntax highlighting extension
   for the goldmark markdown parser.
 - [goldmark-mathjax](https://github.com/litao91/goldmark-mathjax): Mathjax support for goldmark markdown parser
 
