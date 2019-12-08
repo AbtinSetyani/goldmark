@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/util"
 )
 
 // A Config struct has configurations for the HTML based renderers.

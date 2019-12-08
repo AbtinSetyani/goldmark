@@ -2,12 +2,13 @@ package extension
 
 import (
 	"bytes"
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"regexp"
+
+	"github.com/enkogu/goldmark"
+	"github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 var wwwURLRegxp = regexp.MustCompile(`^www\.[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=\(\);,'"]*)`)
