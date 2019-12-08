@@ -5,26 +5,26 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/util"
 )
 
 // A Config struct has configurations for the HTML based renderers.
 type Config struct {
-	Writer    Writer
-	HardWraps bool
-	XHTML     bool
-	Unsafe    bool
+	RenderState RenderState
+	HardWraps   bool
+	XHTML       bool
+	Unsafe      bool
 }
 
 // NewConfig returns a new Config with defaults.
 func NewConfig() Config {
 	return Config{
-		Writer:    DefaultWriter,
-		HardWraps: false,
-		XHTML:     false,
-		Unsafe:    false,
+		RenderState: DefaultRenderState,
+		HardWraps:   false,
+		XHTML:       false,
+		Unsafe:      false,
 	}
 }
 
@@ -37,8 +37,8 @@ func (c *Config) SetOption(name renderer.OptionName, value interface{}) {
 		c.XHTML = value.(bool)
 	case optUnsafe:
 		c.Unsafe = value.(bool)
-	case optTextWriter:
-		c.Writer = value.(Writer)
+	case optTextRenderState:
+		c.RenderState = value.(RenderState)
 	}
 }
 
@@ -47,28 +47,28 @@ type Option interface {
 	SetHTMLOption(*Config)
 }
 
-// TextWriter is an option name used in WithWriter.
-const optTextWriter renderer.OptionName = "Writer"
+// TextRenderState is an option name used in WithRenderState.
+const optTextRenderState renderer.OptionName = "RenderState"
 
-type withWriter struct {
-	value Writer
+type withRenderState struct {
+	value RenderState
 }
 
-func (o *withWriter) SetConfig(c *renderer.Config) {
-	c.Options[optTextWriter] = o.value
+func (o *withRenderState) SetConfig(c *renderer.Config) {
+	c.Options[optTextRenderState] = o.value
 }
 
-func (o *withWriter) SetHTMLOption(c *Config) {
-	c.Writer = o.value
+func (o *withRenderState) SetHTMLOption(c *Config) {
+	c.RenderState = o.value
 }
 
-// WithWriter is a functional option that allow you to set the given writer to
+// WithRenderState is a functional option that allow you to set the given writer to
 // the renderer.
-func WithWriter(writer Writer) interface {
+func WithRenderState(writer RenderState) interface {
 	renderer.Option
 	Option
 } {
-	return &withWriter{writer}
+	return &withRenderState{writer}
 }
 
 // HardWraps is an option name used in WithHardWraps.
@@ -186,20 +186,20 @@ func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(ast.KindString, r.renderString)
 }
 
-func (r *Renderer) writeLines(w util.BufWriter, source []byte, n ast.Node) {
+func (r *Renderer) writeLines(w util.BufRenderState, source []byte, n ast.Node) {
 	l := n.Lines().Len()
 	for i := 0; i < l; i++ {
 		line := n.Lines().At(i)
-		r.Writer.RawWrite(w, line.Value(source))
+		r.RenderState.RawWrite(w, line.Value(source))
 	}
 }
 
-func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderDocument(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// nothing to do
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderHeading(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Heading)
 	if entering {
 		_, _ = w.WriteString("<h")
@@ -216,7 +216,7 @@ func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node,
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquote(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderBlockquote(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<blockquote>\n")
 	} else {
@@ -225,7 +225,7 @@ func (r *Renderer) renderBlockquote(w util.BufWriter, source []byte, n ast.Node,
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderCodeBlock(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<pre><code>")
 		r.writeLines(w, source, n)
@@ -235,14 +235,14 @@ func (r *Renderer) renderCodeBlock(w util.BufWriter, source []byte, n ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderFencedCodeBlock(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.FencedCodeBlock)
 	if entering {
 		_, _ = w.WriteString("<pre><code")
 		language := n.Language(source)
 		if language != nil {
 			_, _ = w.WriteString(" class=\"language-")
-			r.Writer.Write(w, language)
+			r.RenderState.Write(w, language)
 			_, _ = w.WriteString("\"")
 		}
 		_ = w.WriteByte('>')
@@ -253,7 +253,7 @@ func (r *Renderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node a
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderHTMLBlock(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.HTMLBlock)
 	if entering {
 		if r.Unsafe {
@@ -278,7 +278,7 @@ func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Nod
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderList(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderList(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.List)
 	tag := "ul"
 	if n.IsOrdered() {
@@ -300,7 +300,7 @@ func (r *Renderer) renderList(w util.BufWriter, source []byte, node ast.Node, en
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderListItem(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<li>")
 		fc := n.FirstChild()
@@ -315,7 +315,7 @@ func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, e
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderParagraph(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<p>")
 	} else {
@@ -324,7 +324,7 @@ func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderTextBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderTextBlock(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		if _, ok := n.NextSibling().(ast.Node); ok && n.FirstChild() != nil {
 			_ = w.WriteByte('\n')
@@ -333,7 +333,7 @@ func (r *Renderer) renderTextBlock(w util.BufWriter, source []byte, n ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreak(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderThematicBreak(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -345,7 +345,7 @@ func (r *Renderer) renderThematicBreak(w util.BufWriter, source []byte, n ast.No
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderAutoLink(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.AutoLink)
 	if !entering {
 		return ast.WalkContinue, nil
@@ -363,19 +363,19 @@ func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderCodeSpan(w util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<code>")
 		for c := n.FirstChild(); c != nil; c = c.NextSibling() {
 			segment := c.(*ast.Text).Segment
 			value := segment.Value(source)
 			if bytes.HasSuffix(value, []byte("\n")) {
-				r.Writer.RawWrite(w, value[:len(value)-1])
+				r.RenderState.RawWrite(w, value[:len(value)-1])
 				if c != n.LastChild() {
-					r.Writer.RawWrite(w, []byte(" "))
+					r.RenderState.RawWrite(w, []byte(" "))
 				}
 			} else {
-				r.Writer.RawWrite(w, value)
+				r.RenderState.RawWrite(w, value)
 			}
 		}
 		return ast.WalkSkipChildren, nil
@@ -384,7 +384,7 @@ func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, e
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderEmphasis(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Emphasis)
 	tag := "em"
 	if n.Level == 2 {
@@ -402,7 +402,7 @@ func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderLink(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
 	if entering {
 		_, _ = w.WriteString("<a href=\"")
@@ -412,7 +412,7 @@ func (r *Renderer) renderLink(w util.BufWriter, source []byte, node ast.Node, en
 		_ = w.WriteByte('"')
 		if n.Title != nil {
 			_, _ = w.WriteString(` title="`)
-			r.Writer.Write(w, n.Title)
+			r.RenderState.Write(w, n.Title)
 			_ = w.WriteByte('"')
 		}
 		_ = w.WriteByte('>')
@@ -421,7 +421,7 @@ func (r *Renderer) renderLink(w util.BufWriter, source []byte, node ast.Node, en
 	}
 	return ast.WalkContinue, nil
 }
-func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderImage(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -435,7 +435,7 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 	_ = w.WriteByte('"')
 	if n.Title != nil {
 		_, _ = w.WriteString(` title="`)
-		r.Writer.Write(w, n.Title)
+		r.RenderState.Write(w, n.Title)
 		_ = w.WriteByte('"')
 	}
 	if r.XHTML {
@@ -446,7 +446,7 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 	return ast.WalkSkipChildren, nil
 }
 
-func (r *Renderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderRawHTML(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkSkipChildren, nil
 	}
@@ -463,16 +463,16 @@ func (r *Renderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node,
 	return ast.WalkSkipChildren, nil
 }
 
-func (r *Renderer) renderText(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderText(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
 	n := node.(*ast.Text)
 	segment := n.Segment
 	if n.IsRaw() {
-		r.Writer.RawWrite(w, segment.Value(source))
+		r.RenderState.RawWrite(w, segment.Value(source))
 	} else {
-		r.Writer.Write(w, segment.Value(source))
+		r.RenderState.Write(w, segment.Value(source))
 		if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
 			if r.XHTML {
 				_, _ = w.WriteString("<br />\n")
@@ -486,7 +486,7 @@ func (r *Renderer) renderText(w util.BufWriter, source []byte, node ast.Node, en
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderString(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderString(w util.BufRenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -495,16 +495,16 @@ func (r *Renderer) renderString(w util.BufWriter, source []byte, node ast.Node, 
 		_, _ = w.Write(n.Value)
 	} else {
 		if n.IsRaw() {
-			r.Writer.RawWrite(w, n.Value)
+			r.RenderState.RawWrite(w, n.Value)
 		} else {
-			r.Writer.Write(w, n.Value)
+			r.RenderState.Write(w, n.Value)
 		}
 	}
 	return ast.WalkContinue, nil
 }
 
 // RenderAttributes renders given node's attributes.
-func (r *Renderer) RenderAttributes(w util.BufWriter, node ast.Node) {
+func (r *Renderer) RenderAttributes(w util.BufRenderState, node ast.Node) {
 
 	for _, attr := range node.Attributes() {
 		_, _ = w.WriteString(" ")
@@ -515,21 +515,21 @@ func (r *Renderer) RenderAttributes(w util.BufWriter, node ast.Node) {
 	}
 }
 
-// A Writer interface wirtes textual contents to a writer.
-type Writer interface {
+// A RenderState interface wirtes textual contents to a writer.
+type RenderState interface {
 	// Write writes the given source to writer with resolving references and unescaping
 	// backslash escaped characters.
-	Write(writer util.BufWriter, source []byte)
+	Write(writer util.BufRenderState, source []byte)
 
 	// RawWrite wirtes the given source to writer without resolving references and
 	// unescaping backslash escaped characters.
-	RawWrite(writer util.BufWriter, source []byte)
+	RawWrite(writer util.BufRenderState, source []byte)
 }
 
-type defaultWriter struct {
+type defaultRenderState struct {
 }
 
-func escapeRune(writer util.BufWriter, r rune) {
+func escapeRune(writer util.BufRenderState, r rune) {
 	if r < 256 {
 		v := util.EscapeHTMLByte(byte(r))
 		if v != nil {
@@ -540,7 +540,7 @@ func escapeRune(writer util.BufWriter, r rune) {
 	_, _ = writer.WriteRune(util.ToValidRune(r))
 }
 
-func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
+func (d *defaultRenderState) RawWrite(writer util.BufRenderState, source []byte) {
 	n := 0
 	l := len(source)
 	for i := 0; i < l; i++ {
@@ -558,7 +558,7 @@ func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
 	}
 }
 
-func (d *defaultWriter) Write(writer util.BufWriter, source []byte) {
+func (d *defaultRenderState) Write(writer util.BufRenderState, source []byte) {
 	escaped := false
 	var ok bool
 	limit := len(source)
@@ -630,8 +630,8 @@ func (d *defaultWriter) Write(writer util.BufWriter, source []byte) {
 	d.RawWrite(writer, source[n:])
 }
 
-// DefaultWriter is a default implementation of the Writer.
-var DefaultWriter = &defaultWriter{}
+// DefaultRenderState is a default implementation of the RenderState.
+var DefaultRenderState = &defaultRenderState{}
 
 var bDataImage = []byte("data:image/")
 var bPng = []byte("png;")

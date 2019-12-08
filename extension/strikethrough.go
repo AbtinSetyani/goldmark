@@ -1,14 +1,14 @@
 package extension
 
 import (
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/extension/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark"
+	gast "github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/extension/ast"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 type strikethroughDelimiterProcessor struct {
@@ -82,7 +82,7 @@ func (r *StrikethroughHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncR
 	reg.Register(ast.KindStrikethrough, r.renderStrikethrough)
 }
 
-func (r *StrikethroughHTMLRenderer) renderStrikethrough(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *StrikethroughHTMLRenderer) renderStrikethrough(w util.BufRenderState, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		w.WriteString("<del>")
 	} else {

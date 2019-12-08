@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/enkogu/goldmark"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/util"
 	gomarkdown "github.com/gomarkdown/markdown"
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/util"
 	"gitlab.com/golang-commonmark/markdown"
 
 	bf2 "gopkg.in/russross/blackfriday.v2"

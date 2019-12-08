@@ -6,8 +6,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/util"
 )
 
 // A Config struct is a data structure that holds configuration of the Renderer.
@@ -70,7 +70,7 @@ type SetOptioner interface {
 }
 
 // NodeRendererFunc is a function that renders a given node.
-type NodeRendererFunc func(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
+type NodeRendererFunc func(writer util.BufRenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
 
 // A NodeRenderer interface offers NodeRendererFuncs.
 type NodeRenderer interface {
@@ -87,7 +87,7 @@ type NodeRendererFuncRegisterer interface {
 // A Renderer interface renders given AST node to given
 // writer with given Renderer.
 type Renderer interface {
-	Render(w io.Writer, source []byte, n ast.Node) error
+	Render(w io.RenderState, source []byte, n ast.Node) error
 
 	// AddOptions adds given option to this renderer.
 	AddOptions(...Option)
@@ -132,7 +132,7 @@ func (r *renderer) Register(kind ast.NodeKind, v NodeRendererFunc) {
 }
 
 // Render renders the given AST node to the given writer with the given Renderer.
-func (r *renderer) Render(w io.Writer, source []byte, n ast.Node) error {
+func (r *renderer) Render(w io.RenderState, source []byte, n ast.Node) error {
 	r.initSync.Do(func() {
 		r.options = r.config.Options
 		r.config.NodeRenderers.Sort()
@@ -154,9 +154,9 @@ func (r *renderer) Render(w io.Writer, source []byte, n ast.Node) error {
 		r.config = nil
 		r.nodeRendererFuncsTmp = nil
 	})
-	writer, ok := w.(util.BufWriter)
+	writer, ok := w.(util.BufRenderState)
 	if !ok {
-		writer = bufio.NewWriter(w)
+		writer = bufio.NewRenderState(w)
 	}
 	err := ast.Walk(n, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		s := ast.WalkStatus(ast.WalkContinue)

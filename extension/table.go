@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/extension/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark"
+	gast "github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/extension/ast"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 var tableDelimRegexp = regexp.MustCompile(`^[\s\-\|\:]+$`)
@@ -153,7 +153,7 @@ func (r *TableHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegistere
 	reg.Register(ast.KindTableCell, r.renderTableCell)
 }
 
-func (r *TableHTMLRenderer) renderTable(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTable(w util.BufRenderState, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<table>\n")
 	} else {
@@ -162,7 +162,7 @@ func (r *TableHTMLRenderer) renderTable(w util.BufWriter, source []byte, n gast.
 	return gast.WalkContinue, nil
 }
 
-func (r *TableHTMLRenderer) renderTableHeader(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTableHeader(w util.BufRenderState, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<thead>\n")
 		_, _ = w.WriteString("<tr>\n")
@@ -176,7 +176,7 @@ func (r *TableHTMLRenderer) renderTableHeader(w util.BufWriter, source []byte, n
 	return gast.WalkContinue, nil
 }
 
-func (r *TableHTMLRenderer) renderTableRow(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTableRow(w util.BufRenderState, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<tr>\n")
 	} else {
@@ -188,7 +188,7 @@ func (r *TableHTMLRenderer) renderTableRow(w util.BufWriter, source []byte, n ga
 	return gast.WalkContinue, nil
 }
 
-func (r *TableHTMLRenderer) renderTableCell(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTableCell(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	n := node.(*ast.TableCell)
 	tag := "td"
 	if n.Parent().Kind() == ast.KindTableHeader {

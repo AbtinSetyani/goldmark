@@ -2,15 +2,16 @@ package extension
 
 import (
 	"bytes"
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/extension/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"strconv"
+
+	"github.com/enkogu/goldmark"
+	gast "github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/extension/ast"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 var footnoteListKey = parser.NewContextKey()
@@ -234,7 +235,7 @@ func (r *FootnoteHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegist
 	reg.Register(ast.KindFootnoteList, r.renderFootnoteList)
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnoteLink(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnoteLink(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		n := node.(*ast.FootnoteLink)
 		is := strconv.Itoa(n.Index)
@@ -249,7 +250,7 @@ func (r *FootnoteHTMLRenderer) renderFootnoteLink(w util.BufWriter, source []byt
 	return gast.WalkContinue, nil
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnoteBackLink(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnoteBackLink(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		n := node.(*ast.FootnoteBackLink)
 		is := strconv.Itoa(n.Index)
@@ -262,7 +263,7 @@ func (r *FootnoteHTMLRenderer) renderFootnoteBackLink(w util.BufWriter, source [
 	return gast.WalkContinue, nil
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnote(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnote(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	n := node.(*ast.Footnote)
 	is := strconv.Itoa(n.Index)
 	if entering {
@@ -276,7 +277,7 @@ func (r *FootnoteHTMLRenderer) renderFootnote(w util.BufWriter, source []byte, n
 	return gast.WalkContinue, nil
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnoteList(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnoteList(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	tag := "section"
 	if r.Config.XHTML {
 		tag = "div"

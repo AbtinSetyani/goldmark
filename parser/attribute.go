@@ -5,8 +5,8 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 var attrNameID = []byte("id")
@@ -231,7 +231,7 @@ func parseAttributeString(reader text.Reader) ([]byte, bool) {
 	return nil, false
 }
 
-func scanAttributeDecimal(reader text.Reader, w io.ByteWriter) {
+func scanAttributeDecimal(reader text.Reader, w io.ByteRenderState) {
 	for {
 		c := reader.Peek()
 		if util.IsNumeric(c) {

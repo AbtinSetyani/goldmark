@@ -2,12 +2,13 @@
 package goldmark
 
 import (
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"io"
+
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 // DefaultParser returns a new Parser that is configured by default values.
@@ -27,7 +28,7 @@ var defaultMarkdown = New()
 
 // Convert interprets a UTF-8 bytes source in Markdown and
 // write rendered contents to a writer w.
-func Convert(source []byte, w io.Writer, opts ...parser.ParseOption) error {
+func Convert(source []byte, w io.RenderState, opts ...parser.ParseOption) error {
 	return defaultMarkdown.Convert(source, w, opts...)
 }
 
@@ -36,7 +37,7 @@ func Convert(source []byte, w io.Writer, opts ...parser.ParseOption) error {
 type Markdown interface {
 	// Convert interprets a UTF-8 bytes source in Markdown and write rendered
 	// contents to a writer w.
-	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
+	Convert(source []byte, writer io.RenderState, opts ...parser.ParseOption) error
 
 	// Parser returns a Parser that will be used for conversion.
 	Parser() parser.Parser
@@ -111,7 +112,7 @@ func New(options ...Option) Markdown {
 	return md
 }
 
-func (m *markdown) Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error {
+func (m *markdown) Convert(source []byte, writer io.RenderState, opts ...parser.ParseOption) error {
 	reader := text.NewReader(source)
 	doc := m.parser.Parse(reader, opts...)
 	return m.renderer.Render(writer, source, doc)

@@ -1,14 +1,14 @@
 package extension
 
 import (
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/extension/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
+	"github.com/enkogu/goldmark"
+	gast "github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/extension/ast"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 type definitionListParser struct {
@@ -196,7 +196,7 @@ func (r *DefinitionListHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFunc
 	reg.Register(ast.KindDefinitionDescription, r.renderDefinitionDescription)
 }
 
-func (r *DefinitionListHTMLRenderer) renderDefinitionList(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *DefinitionListHTMLRenderer) renderDefinitionList(w util.BufRenderState, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<dl>\n")
 	} else {
@@ -205,7 +205,7 @@ func (r *DefinitionListHTMLRenderer) renderDefinitionList(w util.BufWriter, sour
 	return gast.WalkContinue, nil
 }
 
-func (r *DefinitionListHTMLRenderer) renderDefinitionTerm(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *DefinitionListHTMLRenderer) renderDefinitionTerm(w util.BufRenderState, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<dt>")
 	} else {
@@ -214,7 +214,7 @@ func (r *DefinitionListHTMLRenderer) renderDefinitionTerm(w util.BufWriter, sour
 	return gast.WalkContinue, nil
 }
 
-func (r *DefinitionListHTMLRenderer) renderDefinitionDescription(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *DefinitionListHTMLRenderer) renderDefinitionDescription(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		n := node.(*ast.DefinitionDescription)
 		if n.IsTight {

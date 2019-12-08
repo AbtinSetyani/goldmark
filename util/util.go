@@ -3,7 +3,6 @@ package util
 
 import (
 	"bytes"
-	"io"
 	"net/url"
 	"regexp"
 	"sort"
@@ -749,9 +748,9 @@ func IsAlphaNumeric(c byte) bool {
 	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
 }
 
-// A BufWriter is a subset of the bufio.Writer .
-type BufWriter interface {
-	io.Writer
+// A BufRenderState is a subset of the bufio.RenderState .
+type BufRenderState interface {
+	//io.RenderState
 	Available() int
 	Buffered() int
 	Flush() error

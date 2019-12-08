@@ -2,8 +2,9 @@ package ast
 
 import (
 	"fmt"
-	gast "github.com/yuin/goldmark/ast"
 	"strings"
+
+	gast "github.com/enkogu/goldmark/ast"
 )
 
 // Alignment is a text alignment of table cells.

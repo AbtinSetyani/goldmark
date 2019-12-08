@@ -1,15 +1,16 @@
 package extension
 
 import (
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/extension/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"regexp"
+
+	"github.com/enkogu/goldmark"
+	gast "github.com/enkogu/goldmark/ast"
+	"github.com/enkogu/goldmark/extension/ast"
+	"github.com/enkogu/goldmark/parser"
+	"github.com/enkogu/goldmark/renderer"
+	"github.com/enkogu/goldmark/renderer/html"
+	"github.com/enkogu/goldmark/text"
+	"github.com/enkogu/goldmark/util"
 )
 
 var taskListRegexp = regexp.MustCompile(`^\[([\sxX])\]\s*`)
@@ -80,7 +81,7 @@ func (r *TaskCheckBoxHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRe
 	reg.Register(ast.KindTaskCheckBox, r.renderTaskCheckBox)
 }
 
-func (r *TaskCheckBoxHTMLRenderer) renderTaskCheckBox(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TaskCheckBoxHTMLRenderer) renderTaskCheckBox(w util.BufRenderState, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if !entering {
 		return gast.WalkContinue, nil
 	}
