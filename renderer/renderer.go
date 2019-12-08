@@ -4,7 +4,7 @@ package renderer
 import (
 	"bufio"
 	"github.com/enkogu/goldmark/ast"
-	b "github.com/enkogu/goldmark/renderer/blocks"
+	"github.com/enkogu/goldmark/renderer/blocks"
 	"github.com/enkogu/goldmark/util"
 	"io"
 	"sync"
@@ -89,7 +89,7 @@ type NodeRendererFuncRegisterer interface {
 // A Renderer interface renders given AST node to given
 // writer with given Renderer.
 type Renderer interface {
-	Render(w io.Writer, source []byte, n ast.Node) error
+	Render(rs blocks.renderState, source []byte, n ast.Node) error
 
 	// AddOptions adds given option to this renderer.
 	AddOptions(...Option)
@@ -102,6 +102,7 @@ type renderer struct {
 	maxKind              int
 	nodeRendererFuncs    []NodeRendererFunc
 	initSync             sync.Once
+
 }
 
 // NewRenderer returns a new Renderer with given options.
