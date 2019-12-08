@@ -3,11 +3,11 @@ package renderer
 
 import (
 	"bufio"
+	"github.com/enkogu/goldmark/ast"
+	b "github.com/enkogu/goldmark/renderer/blocks"
+	"github.com/enkogu/goldmark/util"
 	"io"
 	"sync"
-
-	"github.com/enkogu/goldmark/ast"
-	"github.com/enkogu/goldmark/util"
 )
 
 // A Config struct is a data structure that holds configuration of the Renderer.
@@ -69,8 +69,10 @@ type SetOptioner interface {
 	SetOption(name OptionName, value interface{})
 }
 
+
+
 // NodeRendererFunc is a function that renders a given node.
-type NodeRendererFunc func(rs renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
+type NodeRendererFunc func(rs b.RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
 
 // A NodeRenderer interface offers NodeRendererFuncs.
 type NodeRenderer interface {

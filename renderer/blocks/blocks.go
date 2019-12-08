@@ -186,7 +186,8 @@ func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(ast.KindString, r.renderString)
 }
 
-type renderState struct {
+// RenderState is a ololo
+type RenderState struct {
 	isCurrentBlock bool
 	blockBuffer    *model.Block
 	textBuffer     string
@@ -194,7 +195,7 @@ type renderState struct {
 	blocksList     []model.Block
 }
 
-func (rs *renderState) closeCurrentBlock() {
+func (rs *RenderState) closeCurrentBlock() {
 	rs.isCurrentBlock = false
 	// TODO: set textBuffer value to *rs.blockBuffer
 	rs.blocksList = append(rs.blocksList, *rs.blockBuffer)
@@ -202,7 +203,7 @@ func (rs *renderState) closeCurrentBlock() {
 	rs.textBuffer = ""
 }
 
-func (rs *renderState) openNewBlock(content model.IsBlockContent) {
+func (rs *RenderState) openNewBlock(content model.IsBlockContent) {
 	if rs.isCurrentBlock {
 		rs.closeCurrentBlock()
 	}
@@ -213,15 +214,15 @@ func (rs *renderState) openNewBlock(content model.IsBlockContent) {
 	}
 }
 
-func (rs *renderState) addTextToBuffer(text string) {
+func (rs *RenderState) addTextToBuffer(text string) {
 	rs.textBuffer += text
 }
 
-func (rs *renderState) openMark(text string) {
+func (rs *RenderState) openMark(text string) {
 	// TODO
 }
 
-func (r *Renderer) writeLines(rs *renderState, source []byte, n ast.Node) {
+func (r *Renderer) writeLines(rs *RenderState, source []byte, n ast.Node) {
 	l := n.Lines().Len()
 	for i := 0; i < l; i++ {
 		line := n.Lines().At(i)
@@ -229,12 +230,12 @@ func (r *Renderer) writeLines(rs *renderState, source []byte, n ast.Node) {
 	}
 }
 
-func (r *Renderer) renderDocument(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderDocument(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// nothing to do
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderHeading(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderHeading(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Heading)
 	if entering {
 		rs.openNewBlock(&model.BlockContentOfText{
@@ -251,7 +252,7 @@ func (r *Renderer) renderHeading(rs *renderState, source []byte, node ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderBlockquote(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderBlockquote(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		rs.openNewBlock(&model.BlockContentOfText{
 			Text: &model.BlockContentText{
@@ -264,7 +265,7 @@ func (r *Renderer) renderBlockquote(rs *renderState, source []byte, n ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlock(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderCodeBlock(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		rs.openNewBlock(&model.BlockContentOfText{
 			Text: &model.BlockContentText{
@@ -277,7 +278,7 @@ func (r *Renderer) renderCodeBlock(rs *renderState, source []byte, n ast.Node, e
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderFencedCodeBlock(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderFencedCodeBlock(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.FencedCodeBlock)
 
 	/* TODO
@@ -303,7 +304,7 @@ func (r *Renderer) renderFencedCodeBlock(rs *renderState, source []byte, node as
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderHTMLBlock(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderHTMLBlock(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	/* NO RAW HTML after html->markdown->html conversions
 	n := node.(*ast.HTMLBlock)
 	if entering {
@@ -329,7 +330,7 @@ func (r *Renderer) renderHTMLBlock(rs *renderState, source []byte, node ast.Node
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderList(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderList(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	/*n := node.(*ast.List)
 	tag := "ul"
 	if n.IsOrdered() {
@@ -351,7 +352,7 @@ func (r *Renderer) renderList(rs *renderState, source []byte, node ast.Node, ent
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderListItem(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderListItem(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<li>")
 		fc := n.FirstChild()
@@ -366,7 +367,7 @@ func (r *Renderer) renderListItem(rs *renderState, source []byte, n ast.Node, en
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderParagraph(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderParagraph(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		rs.openNewBlock(&model.BlockContentOfText{
 			Text: &model.BlockContentText{
@@ -379,7 +380,7 @@ func (r *Renderer) renderParagraph(rs *renderState, source []byte, n ast.Node, e
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderTextBlock(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderTextBlock(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	/* TODO: create a new block or write to the current?
 	if !entering {
 
@@ -390,7 +391,7 @@ func (r *Renderer) renderTextBlock(rs *renderState, source []byte, n ast.Node, e
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderThematicBreak(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderThematicBreak(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		rs.closeCurrentBlock()
 	}
@@ -398,7 +399,7 @@ func (r *Renderer) renderThematicBreak(rs *renderState, source []byte, n ast.Nod
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderAutoLink(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderAutoLink(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.AutoLink)
 	if !entering {
 		return ast.WalkContinue, nil
@@ -416,7 +417,7 @@ func (r *Renderer) renderAutoLink(rs *renderState, source []byte, node ast.Node,
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeSpan(rs *renderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderCodeSpan(rs *RenderState, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<code>")
 		for c := n.FirstChild(); c != nil; c = c.NextSibling() {
@@ -437,7 +438,7 @@ func (r *Renderer) renderCodeSpan(rs *renderState, source []byte, n ast.Node, en
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderEmphasis(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderEmphasis(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Emphasis)
 	tag := "em"
 	if n.Level == 2 {
@@ -455,7 +456,7 @@ func (r *Renderer) renderEmphasis(rs *renderState, source []byte, node ast.Node,
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderLink(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderLink(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
 	if entering {
 		_, _ = w.WriteString("<a href=\"")
@@ -474,7 +475,7 @@ func (r *Renderer) renderLink(rs *renderState, source []byte, node ast.Node, ent
 	}
 	return ast.WalkContinue, nil
 }
-func (r *Renderer) renderImage(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderImage(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -499,7 +500,7 @@ func (r *Renderer) renderImage(rs *renderState, source []byte, node ast.Node, en
 	return ast.WalkSkipChildren, nil
 }
 
-func (r *Renderer) renderRawHTML(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderRawHTML(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkSkipChildren, nil
 	}
@@ -516,7 +517,7 @@ func (r *Renderer) renderRawHTML(rs *renderState, source []byte, node ast.Node, 
 	return ast.WalkSkipChildren, nil
 }
 
-func (r *Renderer) renderText(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderText(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -539,7 +540,7 @@ func (r *Renderer) renderText(rs *renderState, source []byte, node ast.Node, ent
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderString(rs *renderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderString(rs *RenderState, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -557,7 +558,7 @@ func (r *Renderer) renderString(rs *renderState, source []byte, node ast.Node, e
 }
 
 // RenderAttributes renders given node's attributes.
-func (r *Renderer) RenderAttributes(rs *renderState, node ast.Node) {
+func (r *Renderer) RenderAttributes(rs *RenderState, node ast.Node) {
 
 	for _, attr := range node.Attributes() {
 		_, _ = w.WriteString(" ")
