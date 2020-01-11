@@ -2,10 +2,11 @@ package parser
 
 import (
 	"bytes"
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"regexp"
+
+	"github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/text"
+	"github.com/anytypeio/goldmark/util"
 )
 
 type rawHTMLParser struct {

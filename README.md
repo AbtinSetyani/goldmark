@@ -1,10 +1,10 @@
 goldmark
 ==========================================
 
-[![http://godoc.org/github.com/yuin/goldmark](https://godoc.org/github.com/yuin/goldmark?status.svg)](http://godoc.org/github.com/yuin/goldmark)
-[![https://github.com/yuin/goldmark/actions?query=workflow:test](https://github.com/yuin/goldmark/workflows/test/badge.svg?branch=master&event=push)](https://github.com/yuin/goldmark/actions?query=workflow:test)
-[![https://coveralls.io/github/yuin/goldmark](https://coveralls.io/repos/github/yuin/goldmark/badge.svg?branch=master)](https://coveralls.io/github/yuin/goldmark)
-[![https://goreportcard.com/report/github.com/yuin/goldmark](https://goreportcard.com/badge/github.com/yuin/goldmark)](https://goreportcard.com/report/github.com/yuin/goldmark)
+[![http://godoc.org/github.com/anytypeio/goldmark](https://godoc.org/github.com/anytypeio/goldmark?status.svg)](http://godoc.org/github.com/anytypeio/goldmark)
+[![https://github.com/anytypeio/goldmark/actions?query=workflow:test](https://github.com/anytypeio/goldmark/workflows/test/badge.svg?branch=master&event=push)](https://github.com/anytypeio/goldmark/actions?query=workflow:test)
+[![https://coveralls.io/github/anytypeio/goldmark](https://coveralls.io/repos/github/anytypeio/goldmark/badge.svg?branch=master)](https://coveralls.io/github/anytypeio/goldmark)
+[![https://goreportcard.com/report/github.com/anytypeio/goldmark](https://goreportcard.com/badge/github.com/anytypeio/goldmark)](https://goreportcard.com/report/github.com/anytypeio/goldmark)
 
 > A Markdown parser written in Go. Easy to extend, standards-compliant, well-structured.
 
@@ -54,7 +54,7 @@ Features
 Installation
 ----------------------
 ```bash
-$ go get github.com/yuin/goldmark
+$ go get github.com/anytypeio/goldmark
 ```
 
 
@@ -65,7 +65,7 @@ Import packages:
 ```go
 import (
     "bytes"
-    "github.com/yuin/goldmark"
+    "github.com/anytypeio/goldmark"
 )
 ```
 
@@ -106,10 +106,10 @@ Custom parser and renderer
 ```go
 import (
     "bytes"
-    "github.com/yuin/goldmark"
-    "github.com/yuin/goldmark/extension"
-    "github.com/yuin/goldmark/parser"
-    "github.com/yuin/goldmark/renderer/html"
+    "github.com/anytypeio/goldmark"
+    "github.com/anytypeio/goldmark/extension"
+    "github.com/anytypeio/goldmark/parser"
+    "github.com/anytypeio/goldmark/renderer/html"
 )
 
 md := goldmark.New(
@@ -320,9 +320,9 @@ As you can see, goldmark's performance is on par with cmark's.
 Extensions
 --------------------
 
-- [goldmark-meta](https://github.com/yuin/goldmark-meta): A YAML metadata
+- [goldmark-meta](https://github.com/anytypeio/goldmark-meta): A YAML metadata
   extension for the goldmark Markdown parser.
-- [goldmark-highlighting](https://github.com/yuin/goldmark-highlighting): A syntax-highlighting extension
+- [goldmark-highlighting](https://github.com/anytypeio/goldmark-highlighting): A syntax-highlighting extension
   for the goldmark markdown parser.
 - [goldmark-mathjax](https://github.com/litao91/goldmark-mathjax): Mathjax support for the goldmark markdown parser
 

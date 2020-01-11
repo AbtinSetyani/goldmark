@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/util"
+	"github.com/anytypeio/goldmark"
+	"github.com/anytypeio/goldmark/util"
 )
 
 // TestingT is a subset of the functionality provided by testing.T.

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/renderer/html"
+	"github.com/anytypeio/goldmark"
+	"github.com/anytypeio/goldmark/renderer/html"
 )
 
 func main() {

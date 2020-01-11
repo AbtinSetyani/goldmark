@@ -1,7 +1,7 @@
 .PHONY: test fuzz
 
 test:
-	go test -coverprofile=profile.out -coverpkg=github.com/yuin/goldmark,github.com/yuin/goldmark/ast,github.com/yuin/goldmark/extension,github.com/yuin/goldmark/extension/ast,github.com/yuin/goldmark/parser,github.com/yuin/goldmark/renderer,github.com/yuin/goldmark/renderer/html,github.com/yuin/goldmark/text,github.com/yuin/goldmark/util ./...
+	go test -coverprofile=profile.out -coverpkg=github.com/anytypeio/goldmark,github.com/anytypeio/goldmark/ast,github.com/anytypeio/goldmark/extension,github.com/anytypeio/goldmark/extension/ast,github.com/anytypeio/goldmark/parser,github.com/anytypeio/goldmark/renderer,github.com/anytypeio/goldmark/renderer/html,github.com/anytypeio/goldmark/text,github.com/anytypeio/goldmark/util ./...
 
 cov: test
 	go tool cover -html=profile.out

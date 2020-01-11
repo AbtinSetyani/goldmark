@@ -5,9 +5,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
+	"github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/text"
+	"github.com/anytypeio/goldmark/util"
 )
 
 // A DelimiterProcessor interface provides a set of functions about

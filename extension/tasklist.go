@@ -1,15 +1,16 @@
 package extension
 
 import (
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/extension/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"regexp"
+
+	"github.com/anytypeio/goldmark"
+	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/extension/ast"
+	"github.com/anytypeio/goldmark/parser"
+	"github.com/anytypeio/goldmark/renderer"
+	"github.com/anytypeio/goldmark/renderer/html"
+	"github.com/anytypeio/goldmark/text"
+	"github.com/anytypeio/goldmark/util"
 )
 
 var taskListRegexp = regexp.MustCompile(`^\[([\sxX])\]\s*`)

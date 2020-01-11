@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	. "github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/testutil"
+	. "github.com/anytypeio/goldmark"
+	"github.com/anytypeio/goldmark/renderer/html"
+	"github.com/anytypeio/goldmark/testutil"
 )
 
 type commonmarkSpecTestCase struct {

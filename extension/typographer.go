@@ -3,11 +3,11 @@ package extension
 import (
 	"unicode"
 
-	"github.com/yuin/goldmark"
-	gast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
+	"github.com/anytypeio/goldmark"
+	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/parser"
+	"github.com/anytypeio/goldmark/text"
+	"github.com/anytypeio/goldmark/util"
 )
 
 // TypographicPunctuation is a key of the punctuations that can be replaced with

@@ -2,12 +2,13 @@
 package goldmark
 
 import (
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
-	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 	"io"
+
+	"github.com/anytypeio/goldmark/parser"
+	"github.com/anytypeio/goldmark/renderer"
+	"github.com/anytypeio/goldmark/renderer/html"
+	"github.com/anytypeio/goldmark/text"
+	"github.com/anytypeio/goldmark/util"
 )
 
 // DefaultParser returns a new Parser that is configured by default values.

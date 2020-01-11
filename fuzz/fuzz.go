@@ -3,10 +3,10 @@ package fuzz
 import (
 	"bytes"
 
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/extension"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer/html"
+	"github.com/anytypeio/goldmark"
+	"github.com/anytypeio/goldmark/extension"
+	"github.com/anytypeio/goldmark/parser"
+	"github.com/anytypeio/goldmark/renderer/html"
 )
 
 // Fuzz runs automated fuzzing against goldmark.
