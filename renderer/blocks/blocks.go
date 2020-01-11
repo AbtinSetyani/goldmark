@@ -3,6 +3,7 @@ package blocks
 import (
 	"bytes"
 	"fmt"
+	"github.com/anytypeio/goldmark"
 	"strconv"
 
 	"github.com/anytypeio/go-anytype-library/pb/model"
@@ -19,17 +20,17 @@ type renderState struct {
 	blocksList     []model.Block
 }
 
-// A Config struct has configurations for the HTML based renderers.
-type Config struct {
+// A BlocksConfig struct has configurations for the HTML based renderers.
+type BlocksConfig struct {
 	Writer    Writer
 	HardWraps bool
 	XHTML     bool
 	Unsafe    bool
 }
 
-// NewConfig returns a new Config with defaults.
-func NewConfig() Config {
-	return Config{
+// NewBlocksConfig returns a new BlocksConfig with defaults.
+func NewBlocksConfig() BlocksConfig {
+	return BlocksConfig{
 		Writer:    DefaultWriter,
 		HardWraps: false,
 		XHTML:     false,
@@ -37,8 +38,8 @@ func NewConfig() Config {
 	}
 }
 
-// SetOption implements renderer.NodeRenderer.SetOption.
-func (c *Config) SetOption(name renderer.OptionName, value interface{}) {
+// SetBlocksOption implements renderer.NodeBlocksRenderer.SetBlocksOption.
+func (c *BlocksConfig) SetBlocksOption(name renderer.BlocksOptionName, value interface{}) {
 	switch name {
 	case optHardWraps:
 		c.HardWraps = value.(bool)
@@ -51,124 +52,124 @@ func (c *Config) SetOption(name renderer.OptionName, value interface{}) {
 	}
 }
 
-// An Option interface sets options for HTML based renderers.
-type Option interface {
-	SetHTMLOption(*Config)
+// An BlocksOption interface sets options for HTML based renderers.
+type BlocksOption interface {
+	SetHTMLBlocksOption(*BlocksConfig)
 }
 
 // TextWriter is an option name used in WithWriter.
-const optTextWriter renderer.OptionName = "Writer"
+const optTextWriter renderer.BlocksOptionName = "Writer"
 
 type withWriter struct {
 	value Writer
 }
 
-func (o *withWriter) SetConfig(c *renderer.Config) {
-	c.Options[optTextWriter] = o.value
+func (o *withWriter) SetBlocksConfig(c *renderer.BlocksConfig) {
+	c.BlocksOptions[optTextWriter] = o.value
 }
 
-func (o *withWriter) SetHTMLOption(c *Config) {
+func (o *withWriter) SetHTMLBlocksOption(c *BlocksConfig) {
 	c.Writer = o.value
 }
 
 // WithWriter is a functional option that allow you to set the given writer to
 // the renderer.
 func WithWriter(writer Writer) interface {
-	renderer.Option
-	Option
+	renderer.BlocksOption
+	BlocksOption
 } {
 	return &withWriter{writer}
 }
 
 // HardWraps is an option name used in WithHardWraps.
-const optHardWraps renderer.OptionName = "HardWraps"
+const optHardWraps renderer.BlocksOptionName = "HardWraps"
 
 type withHardWraps struct {
 }
 
-func (o *withHardWraps) SetConfig(c *renderer.Config) {
-	c.Options[optHardWraps] = true
+func (o *withHardWraps) SetBlocksConfig(c *renderer.BlocksConfig) {
+	c.BlocksOptions[optHardWraps] = true
 }
 
-func (o *withHardWraps) SetHTMLOption(c *Config) {
+func (o *withHardWraps) SetHTMLBlocksOption(c *BlocksConfig) {
 	c.HardWraps = true
 }
 
 // WithHardWraps is a functional option that indicates whether softline breaks
 // should be rendered as '<br>'.
 func WithHardWraps() interface {
-	renderer.Option
-	Option
+	renderer.BlocksOption
+	BlocksOption
 } {
 	return &withHardWraps{}
 }
 
 // XHTML is an option name used in WithXHTML.
-const optXHTML renderer.OptionName = "XHTML"
+const optXHTML renderer.BlocksOptionName = "XHTML"
 
 type withXHTML struct {
 }
 
-func (o *withXHTML) SetConfig(c *renderer.Config) {
-	c.Options[optXHTML] = true
+func (o *withXHTML) SetBlocksConfig(c *renderer.BlocksConfig) {
+	c.BlocksOptions[optXHTML] = true
 }
 
-func (o *withXHTML) SetHTMLOption(c *Config) {
+func (o *withXHTML) SetHTMLBlocksOption(c *BlocksConfig) {
 	c.XHTML = true
 }
 
 // WithXHTML is a functional option indicates that nodes should be rendered in
 // xhtml instead of HTML5.
 func WithXHTML() interface {
-	Option
-	renderer.Option
+	BlocksOption
+	renderer.BlocksOption
 } {
 	return &withXHTML{}
 }
 
 // Unsafe is an option name used in WithUnsafe.
-const optUnsafe renderer.OptionName = "Unsafe"
+const optUnsafe renderer.BlocksOptionName = "Unsafe"
 
 type withUnsafe struct {
 }
 
-func (o *withUnsafe) SetConfig(c *renderer.Config) {
-	c.Options[optUnsafe] = true
+func (o *withUnsafe) SetBlocksConfig(c *renderer.BlocksConfig) {
+	c.BlocksOptions[optUnsafe] = true
 }
 
-func (o *withUnsafe) SetHTMLOption(c *Config) {
+func (o *withUnsafe) SetHTMLBlocksOption(c *BlocksConfig) {
 	c.Unsafe = true
 }
 
 // WithUnsafe is a functional option that renders dangerous contents
 // (raw htmls and potentially dangerous links) as it is.
 func WithUnsafe() interface {
-	renderer.Option
-	Option
+	renderer.BlocksOption
+	BlocksOption
 } {
 	return &withUnsafe{}
 }
 
-// A Renderer struct is an implementation of renderer.NodeRenderer that renders
+// A BlocksRenderer struct is an implementation of renderer.NodeBlocksRenderer that renders
 // nodes as (X)HTML.
-type Renderer struct {
-	Config
+type BlocksRenderer struct {
+	BlocksConfig
 }
 
-// NewRenderer returns a new Renderer with given options.
-func NewRenderer(opts ...Option) renderer.NodeRenderer {
-	r := &Renderer{
-		Config: NewConfig(),
+// NewBlocksRenderer returns a new BlocksRenderer with given options.
+func NewBlocksRenderer(opts ...BlocksOption) renderer.NodeBlocksRenderer {
+	r := &BlocksRenderer{
+		BlocksConfig: NewBlocksConfig(),
 	}
 
 	for _, opt := range opts {
-		opt.SetHTMLOption(&r.Config)
+		opt.SetHTMLBlocksOption(&r.BlocksConfig)
 	}
 	return r
 }
 
-// RegisterFuncs implements NodeRenderer.RegisterFuncs .
-func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+// RegisterFuncs implements NodeBlocksRenderer.RegisterFuncs .
+func (r *BlocksRenderer) RegisterFuncs(reg renderer.NodeBlocksRendererFuncRegisterer) {
 	// blocks
 
 	reg.Register(ast.KindDocument, r.renderDocument)
@@ -195,7 +196,7 @@ func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(ast.KindString, r.renderString)
 }
 
-func (r *Renderer) writeLines(w util.BufWriter, source []byte, n ast.Node) {
+func (r *BlocksRenderer) writeLines(w goldmark.BlocksWriter, source []byte, n ast.Node) {
 	l := n.Lines().Len()
 	for i := 0; i < l; i++ {
 		line := n.Lines().At(i)
@@ -225,7 +226,7 @@ var GlobalAttributeFilter = util.NewBytesFilter(
 	[]byte("translate"),
 )
 
-func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderDocument(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// nothing to do
 	return ast.WalkContinue, nil
 }
@@ -233,7 +234,7 @@ func (r *Renderer) renderDocument(w util.BufWriter, source []byte, node ast.Node
 // HeadingAttributeFilter defines attribute names which heading elements can have
 var HeadingAttributeFilter = GlobalAttributeFilter
 
-func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderHeading(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Heading)
 	if entering {
 		_, _ = w.WriteString("<h")
@@ -255,7 +256,7 @@ var BlockquoteAttributeFilter = GlobalAttributeFilter.Extend(
 	[]byte("cite"),
 )
 
-func (r *Renderer) renderBlockquote(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderBlockquote(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<blockquote")
@@ -270,7 +271,7 @@ func (r *Renderer) renderBlockquote(w util.BufWriter, source []byte, n ast.Node,
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderCodeBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderCodeBlock(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<pre><code>")
 		r.writeLines(w, source, n)
@@ -280,7 +281,7 @@ func (r *Renderer) renderCodeBlock(w util.BufWriter, source []byte, n ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderFencedCodeBlock(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.FencedCodeBlock)
 	if entering {
 		_, _ = w.WriteString("<pre><code")
@@ -298,7 +299,7 @@ func (r *Renderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node a
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderHTMLBlock(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.HTMLBlock)
 	if entering {
 		if r.Unsafe {
@@ -329,7 +330,7 @@ var ListAttributeFilter = GlobalAttributeFilter.Extend(
 	[]byte("reversed"),
 )
 
-func (r *Renderer) renderList(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderList(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.List)
 	tag := "ul"
 	if n.IsOrdered() {
@@ -358,7 +359,7 @@ var ListItemAttributeFilter = GlobalAttributeFilter.Extend(
 	[]byte("value"),
 )
 
-func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderListItem(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<li")
@@ -382,7 +383,7 @@ func (r *Renderer) renderListItem(w util.BufWriter, source []byte, n ast.Node, e
 // ParagraphAttributeFilter defines attribute names which paragraph elements can have.
 var ParagraphAttributeFilter = GlobalAttributeFilter
 
-func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderParagraph(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<p")
@@ -397,7 +398,7 @@ func (r *Renderer) renderParagraph(w util.BufWriter, source []byte, n ast.Node, 
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderTextBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderTextBlock(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		if _, ok := n.NextSibling().(ast.Node); ok && n.FirstChild() != nil {
 			_ = w.WriteByte('\n')
@@ -415,7 +416,7 @@ var ThematicAttributeFilter = GlobalAttributeFilter.Extend(
 	[]byte("width"),   // [Deprecated]
 )
 
-func (r *Renderer) renderThematicBreak(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderThematicBreak(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -444,7 +445,7 @@ var LinkAttributeFilter = GlobalAttributeFilter.Extend(
 	[]byte("target"),
 )
 
-func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderAutoLink(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.AutoLink)
 	if !entering {
 		return ast.WalkContinue, nil
@@ -471,7 +472,7 @@ func (r *Renderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node
 // CodeAttributeFilter defines attribute names which code elements can have.
 var CodeAttributeFilter = GlobalAttributeFilter
 
-func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderCodeSpan(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<code")
@@ -501,7 +502,7 @@ func (r *Renderer) renderCodeSpan(w util.BufWriter, source []byte, n ast.Node, e
 // EmphasisAttributeFilter defines attribute names which emphasis elements can have.
 var EmphasisAttributeFilter = GlobalAttributeFilter
 
-func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderEmphasis(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Emphasis)
 	tag := "em"
 	if n.Level == 2 {
@@ -522,7 +523,7 @@ func (r *Renderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderLink(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
 	if entering {
 		_, _ = w.WriteString("<a href=\"")
@@ -563,7 +564,7 @@ var ImageAttributeFilter = GlobalAttributeFilter.Extend(
 	[]byte("width"),
 )
 
-func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderImage(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -591,7 +592,7 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 	return ast.WalkSkipChildren, nil
 }
 
-func (r *Renderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderRawHTML(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkSkipChildren, nil
 	}
@@ -608,7 +609,7 @@ func (r *Renderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node,
 	return ast.WalkSkipChildren, nil
 }
 
-func (r *Renderer) renderText(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderText(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -631,7 +632,7 @@ func (r *Renderer) renderText(w util.BufWriter, source []byte, node ast.Node, en
 	return ast.WalkContinue, nil
 }
 
-func (r *Renderer) renderString(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *BlocksRenderer) renderString(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -653,7 +654,7 @@ var dataPrefix = []byte("data-")
 // RenderAttributes renders given node's attributes.
 // You can specify attribute names to render by the filter.
 // If filter is nil, RenderAttributes renders all attributes.
-func RenderAttributes(w util.BufWriter, node ast.Node, filter util.BytesFilter) {
+func RenderAttributes(w goldmark.BlocksWriter, node ast.Node, filter util.BytesFilter) {
 	for _, attr := range node.Attributes() {
 		if filter != nil && !filter.Contains(attr.Name) {
 			if !bytes.HasPrefix(attr.Name, dataPrefix) {
@@ -673,17 +674,17 @@ func RenderAttributes(w util.BufWriter, node ast.Node, filter util.BytesFilter) 
 type Writer interface {
 	// Write writes the given source to writer with resolving references and unescaping
 	// backslash escaped characters.
-	Write(writer util.BufWriter, source []byte)
+	Write(writer goldmark.BlocksWriter, source []byte)
 
 	// RawWrite wirtes the given source to writer without resolving references and
 	// unescaping backslash escaped characters.
-	RawWrite(writer util.BufWriter, source []byte)
+	RawWrite(writer goldmark.BlocksWriter, source []byte)
 }
 
 type defaultWriter struct {
 }
 
-func escapeRune(writer util.BufWriter, r rune) {
+func escapeRune(writer goldmark.BlocksWriter, r rune) {
 	if r < 256 {
 		v := util.EscapeHTMLByte(byte(r))
 		if v != nil {
@@ -694,7 +695,7 @@ func escapeRune(writer util.BufWriter, r rune) {
 	_, _ = writer.WriteRune(util.ToValidRune(r))
 }
 
-func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
+func (d *defaultWriter) RawWrite(writer goldmark.BlocksWriter, source []byte) {
 	n := 0
 	l := len(source)
 	for i := 0; i < l; i++ {
@@ -712,7 +713,7 @@ func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
 	}
 }
 
-func (d *defaultWriter) Write(writer util.BufWriter, source []byte) {
+func (d *defaultWriter) Write(writer goldmark.BlocksWriter, source []byte) {
 	escaped := false
 	var ok bool
 	limit := len(source)
