@@ -197,12 +197,13 @@ func (r *BlocksRenderer) RegisterFuncs(reg renderer.NodeBlocksRendererFuncRegist
 }
 
 func (r *BlocksRenderer) writeLines(w goldmark.BlocksWriter, source []byte, n ast.Node) {
+	/*
 	l := n.Lines().Len()
 	for i := 0; i < l; i++ {
 		line := n.Lines().At(i)
 		r.Writer.RawWrite(w, line.Value(source))
 	}
-}
+*/ return ast.WalkContinue, nil}
 
 // GlobalAttributeFilter defines attribute names which any elements can have.
 var GlobalAttributeFilter = util.NewBytesFilter(
@@ -227,14 +228,16 @@ var GlobalAttributeFilter = util.NewBytesFilter(
 )
 
 func (r *BlocksRenderer) renderDocument(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	// nothing to do
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // HeadingAttributeFilter defines attribute names which heading elements can have
 var HeadingAttributeFilter = GlobalAttributeFilter
 
 func (r *BlocksRenderer) renderHeading(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.Heading)
 	if entering {
 		_, _ = w.WriteString("<h")
@@ -249,7 +252,7 @@ func (r *BlocksRenderer) renderHeading(w goldmark.BlocksWriter, source []byte, n
 		_, _ = w.WriteString(">\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // BlockquoteAttributeFilter defines attribute names which blockquote elements can have
 var BlockquoteAttributeFilter = GlobalAttributeFilter.Extend(
@@ -257,6 +260,7 @@ var BlockquoteAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *BlocksRenderer) renderBlockquote(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<blockquote")
@@ -269,9 +273,10 @@ func (r *BlocksRenderer) renderBlockquote(w goldmark.BlocksWriter, source []byte
 		_, _ = w.WriteString("</blockquote>\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderCodeBlock(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if entering {
 		_, _ = w.WriteString("<pre><code>")
 		r.writeLines(w, source, n)
@@ -279,9 +284,10 @@ func (r *BlocksRenderer) renderCodeBlock(w goldmark.BlocksWriter, source []byte,
 		_, _ = w.WriteString("</code></pre>\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderFencedCodeBlock(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.FencedCodeBlock)
 	if entering {
 		_, _ = w.WriteString("<pre><code")
@@ -297,9 +303,10 @@ func (r *BlocksRenderer) renderFencedCodeBlock(w goldmark.BlocksWriter, source [
 		_, _ = w.WriteString("</code></pre>\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderHTMLBlock(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.HTMLBlock)
 	if entering {
 		if r.Unsafe {
@@ -322,7 +329,7 @@ func (r *BlocksRenderer) renderHTMLBlock(w goldmark.BlocksWriter, source []byte,
 		}
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // ListAttributeFilter defines attribute names which list elements can have.
 var ListAttributeFilter = GlobalAttributeFilter.Extend(
@@ -331,6 +338,7 @@ var ListAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *BlocksRenderer) renderList(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.List)
 	tag := "ul"
 	if n.IsOrdered() {
@@ -352,7 +360,7 @@ func (r *BlocksRenderer) renderList(w goldmark.BlocksWriter, source []byte, node
 		_, _ = w.WriteString(">\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // ListItemAttributeFilter defines attribute names which list item elements can have.
 var ListItemAttributeFilter = GlobalAttributeFilter.Extend(
@@ -360,6 +368,7 @@ var ListItemAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *BlocksRenderer) renderListItem(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<li")
@@ -378,12 +387,13 @@ func (r *BlocksRenderer) renderListItem(w goldmark.BlocksWriter, source []byte, 
 		_, _ = w.WriteString("</li>\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // ParagraphAttributeFilter defines attribute names which paragraph elements can have.
 var ParagraphAttributeFilter = GlobalAttributeFilter
 
 func (r *BlocksRenderer) renderParagraph(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<p")
@@ -396,16 +406,17 @@ func (r *BlocksRenderer) renderParagraph(w goldmark.BlocksWriter, source []byte,
 		_, _ = w.WriteString("</p>\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderTextBlock(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if !entering {
 		if _, ok := n.NextSibling().(ast.Node); ok && n.FirstChild() != nil {
 			_ = w.WriteByte('\n')
 		}
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // ThematicAttributeFilter defines attribute names which hr elements can have.
 var ThematicAttributeFilter = GlobalAttributeFilter.Extend(
@@ -417,6 +428,7 @@ var ThematicAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *BlocksRenderer) renderThematicBreak(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -430,7 +442,7 @@ func (r *BlocksRenderer) renderThematicBreak(w goldmark.BlocksWriter, source []b
 		_, _ = w.WriteString(">\n")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // LinkAttributeFilter defines attribute names which link elements can have.
 var LinkAttributeFilter = GlobalAttributeFilter.Extend(
@@ -446,6 +458,7 @@ var LinkAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *BlocksRenderer) renderAutoLink(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.AutoLink)
 	if !entering {
 		return ast.WalkContinue, nil
@@ -467,12 +480,13 @@ func (r *BlocksRenderer) renderAutoLink(w goldmark.BlocksWriter, source []byte, 
 	_, _ = w.Write(util.EscapeHTML(label))
 	_, _ = w.WriteString(`</a>`)
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // CodeAttributeFilter defines attribute names which code elements can have.
 var CodeAttributeFilter = GlobalAttributeFilter
 
 func (r *BlocksRenderer) renderCodeSpan(w goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<code")
@@ -497,12 +511,13 @@ func (r *BlocksRenderer) renderCodeSpan(w goldmark.BlocksWriter, source []byte, 
 	}
 	_, _ = w.WriteString("</code>")
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // EmphasisAttributeFilter defines attribute names which emphasis elements can have.
 var EmphasisAttributeFilter = GlobalAttributeFilter
 
 func (r *BlocksRenderer) renderEmphasis(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.Emphasis)
 	tag := "em"
 	if n.Level == 2 {
@@ -521,9 +536,10 @@ func (r *BlocksRenderer) renderEmphasis(w goldmark.BlocksWriter, source []byte, 
 		_ = w.WriteByte('>')
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderLink(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	n := node.(*ast.Link)
 	if entering {
 		_, _ = w.WriteString("<a href=\"")
@@ -544,7 +560,7 @@ func (r *BlocksRenderer) renderLink(w goldmark.BlocksWriter, source []byte, node
 		_, _ = w.WriteString("</a>")
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 // ImageAttributeFilter defines attribute names which image elements can have.
 var ImageAttributeFilter = GlobalAttributeFilter.Extend(
@@ -565,6 +581,7 @@ var ImageAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *BlocksRenderer) renderImage(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -590,9 +607,10 @@ func (r *BlocksRenderer) renderImage(w goldmark.BlocksWriter, source []byte, nod
 		_, _ = w.WriteString(">")
 	}
 	return ast.WalkSkipChildren, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderRawHTML(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if !entering {
 		return ast.WalkSkipChildren, nil
 	}
@@ -607,9 +625,10 @@ func (r *BlocksRenderer) renderRawHTML(w goldmark.BlocksWriter, source []byte, n
 	}
 	_, _ = w.WriteString("<!-- raw HTML omitted -->")
 	return ast.WalkSkipChildren, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderText(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -630,9 +649,10 @@ func (r *BlocksRenderer) renderText(w goldmark.BlocksWriter, source []byte, node
 		}
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 func (r *BlocksRenderer) renderString(w goldmark.BlocksWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	/*
 	if !entering {
 		return ast.WalkContinue, nil
 	}
@@ -647,15 +667,17 @@ func (r *BlocksRenderer) renderString(w goldmark.BlocksWriter, source []byte, no
 		}
 	}
 	return ast.WalkContinue, nil
-}
+*/ return ast.WalkContinue, nil}
 
 var dataPrefix = []byte("data-")
+
 
 // RenderAttributes renders given node's attributes.
 // You can specify attribute names to render by the filter.
 // If filter is nil, RenderAttributes renders all attributes.
+
 func RenderAttributes(w goldmark.BlocksWriter, node ast.Node, filter util.BytesFilter) {
-	for _, attr := range node.Attributes() {
+/*	for _, attr := range node.Attributes() {
 		if filter != nil && !filter.Contains(attr.Name) {
 			if !bytes.HasPrefix(attr.Name, dataPrefix) {
 				continue
@@ -667,7 +689,7 @@ func RenderAttributes(w goldmark.BlocksWriter, node ast.Node, filter util.BytesF
 		// TODO: convert numeric values to strings
 		_, _ = w.Write(util.EscapeHTML(attr.Value.([]byte)))
 		_ = w.WriteByte('"')
-	}
+	}*/
 }
 
 // A Writer interface wirtes textual contents to a writer.
@@ -685,18 +707,19 @@ type defaultWriter struct {
 }
 
 func escapeRune(writer goldmark.BlocksWriter, r rune) {
-	if r < 256 {
+/*	if r < 256 {
 		v := util.EscapeHTMLByte(byte(r))
 		if v != nil {
 			_, _ = writer.Write(v)
 			return
 		}
 	}
-	_, _ = writer.WriteRune(util.ToValidRune(r))
+	_, _ = writer.WriteRune(util.ToValidRune(r))*/
 }
 
 func (d *defaultWriter) RawWrite(writer goldmark.BlocksWriter, source []byte) {
-	n := 0
+	writer.TextBuffer += string(source)
+/*	n := 0
 	l := len(source)
 	for i := 0; i < l; i++ {
 		v := util.EscapeHTMLByte(source[i])
@@ -710,7 +733,7 @@ func (d *defaultWriter) RawWrite(writer goldmark.BlocksWriter, source []byte) {
 	}
 	if n != 0 {
 		_, _ = writer.Write(source[l-n:])
-	}
+	}*/
 }
 
 func (d *defaultWriter) Write(writer goldmark.BlocksWriter, source []byte) {

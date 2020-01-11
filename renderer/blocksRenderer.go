@@ -2,7 +2,7 @@
 package renderer
 
 import (
-	"github.com/anytypeio/goldmark"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"sync"
 
 	"github.com/anytypeio/goldmark/ast"
@@ -73,7 +73,7 @@ type SetBlocksOptioner interface {
 }
 
 // NodeBlocksRendererFunc is a function that renders a given node.
-type NodeBlocksRendererFunc func(bwr goldmark.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
+type NodeBlocksRendererFunc func(bwr blocksUtil.BlocksWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
 
 // A NodeBlocksRenderer interface offers NodeBlocksRendererFuncs.
 type NodeBlocksRenderer interface {
@@ -90,7 +90,7 @@ type NodeBlocksRendererFuncRegisterer interface {
 // A BlocksRenderer interface renders given AST node to given
 // writer with given BlocksRenderer.
 type BlocksRenderer interface {
-	BlocksRender(w goldmark.BlocksWriter, source []byte, n ast.Node) error
+	BlocksRender(w blocksUtil.BlocksWriter, source []byte, n ast.Node) error
 
 	// AddBlocksOptions adds given option to this blocksRenderer.
 	AddBlocksOptions(...BlocksOption)
@@ -135,7 +135,7 @@ func (r *blocksRenderer) Register(kind ast.NodeKind, v NodeBlocksRendererFunc) {
 }
 
 // Render renders the given AST node to the given writer with the given BlocksRenderer.
-func (r *blocksRenderer) Render(w goldmark.BlocksWriter, source []byte, n ast.Node) error {
+/*func (r *blocksRenderer) Render(w blocksUtil.BlocksWriter, source []byte, n ast.Node) error {
 	r.initSync.Do(func() {
 		r.options = r.config.BlocksOptions
 		r.config.NodeBlocksRenderers.Sort()
@@ -157,10 +157,6 @@ func (r *blocksRenderer) Render(w goldmark.BlocksWriter, source []byte, n ast.No
 		r.config = nil
 		r.nodeBlocksRendererFuncsTmp = nil
 	})
-	//writer, _ := w.NewBlocksWriter()
-/*	if !ok {
-		writer = bufio.NewWriter(w)
-	}*/
 	err := ast.Walk(n, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		s := ast.WalkStatus(ast.WalkContinue)
 		var err error
@@ -174,4 +170,49 @@ func (r *blocksRenderer) Render(w goldmark.BlocksWriter, source []byte, n ast.No
 		return err
 	}
 	return w.Flush()
+}*/
+
+// Render renders the given AST node to the given writer with the given BlocksRenderer.
+func (r *blocksRenderer) BlocksRender(w blocksUtil.BlocksWriter, source []byte, n ast.Node) error {
+/*	r.initSync.Do(func() {
+		r.options = r.config.BlocksOptions
+		r.config.NodeBlocksRenderers.Sort()
+		l := len(r.config.NodeBlocksRenderers)
+		for i := l - 1; i >= 0; i-- {
+			v := r.config.NodeBlocksRenderers[i]
+			nr, _ := v.Value.(NodeBlocksRenderer)
+			if se, ok := v.Value.(SetBlocksOptioner); ok {
+				for oname, ovalue := range r.options {
+					se.SetBlocksOption(oname, ovalue)
+				}
+			}
+			nr.RegisterFuncs(r)
+		}
+		r.nodeBlocksRendererFuncs = make([]NodeBlocksRendererFunc, r.maxKind+1)
+		for kind, nr := range r.nodeBlocksRendererFuncsTmp {
+			r.nodeBlocksRendererFuncs[kind] = nr
+		}
+		r.config = nil
+		r.nodeBlocksRendererFuncsTmp = nil
+	})
+	//writer, _ := w.NewBlocksWriter()
+
+	err := ast.Walk(n, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+		s := ast.WalkStatus(ast.WalkContinue)
+		var err error
+		f := r.nodeBlocksRendererFuncs[n.Kind()]
+		if f != nil {
+			s, err = f(w, source, n, entering)
+		}
+		return s, err
+	})
+	if err != nil {
+		return nil, err
+	}
+*/
+	//blocks := []*model.Block{}
+	//block := model.Block{}
+	//blocks = append(blocks, &block)
+
+	return nil
 }

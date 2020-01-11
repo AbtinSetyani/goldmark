@@ -2,6 +2,7 @@
 package goldmark
 
 import (
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"io"
 
 	"github.com/anytypeio/goldmark/parser"
@@ -32,8 +33,13 @@ func Convert(source []byte, w io.Writer, opts ...parser.ParseOption) error {
 	return defaultMarkdown.Convert(source, w, opts...)
 }
 
-func ConvertToBlocks(source []byte, bwr BlocksWriter, opts ...parser.ParseOption) error {
-	return defaultMarkdown.ConvertToBlocks(source, bwr, opts...)
+func ConvertToBlocks(source []byte, opts ...parser.ParseOption) error {
+	err := defaultMarkdown.ConvertToBlocks(source, opts...)
+	if err != nil {
+		return  err
+	}
+
+	return nil
 }
 
 // A Markdown interface offers functions to convert Markdown text to
@@ -42,7 +48,7 @@ type Markdown interface {
 	// Convert interprets a UTF-8 bytes source in Markdown and write rendered
 	// contents to a writer w.
 	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
-	ConvertToBlocks(source []byte, bwr BlocksWriter, opts ...parser.ParseOption) error
+	ConvertToBlocks(source []byte, opts ...parser.ParseOption)  error
 
 	// Parser returns a Parser that will be used for conversion.
 	Parser() parser.Parser
@@ -124,10 +130,18 @@ func (m *markdown) Convert(source []byte, writer io.Writer, opts ...parser.Parse
 	return m.renderer.Render(writer, source, doc)
 }
 
-func (m *markdown) ConvertToBlocks(source []byte, bwr BlocksWriter, opts ...parser.ParseOption) error {
+func (m *markdown) ConvertToBlocks(source []byte, opts ...parser.ParseOption) error {
+	//reader := text.NewReader(source)
+	//doc := m.parser.Parse(reader, opts...)
+	bwr := blocksUtil.BlocksWriter{}
 	reader := text.NewReader(source)
 	doc := m.parser.Parse(reader, opts...)
-	return m.blocksRenderer.BlocksRender(bwr, source, doc)
+	err := m.blocksRenderer.BlocksRender(bwr, source, doc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *markdown) Parser() parser.Parser {
