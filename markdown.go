@@ -32,12 +32,17 @@ func Convert(source []byte, w io.Writer, opts ...parser.ParseOption) error {
 	return defaultMarkdown.Convert(source, w, opts...)
 }
 
+func ConvertToBlocks(source []byte, bwr BlocksWriter, opts ...parser.ParseOption) error {
+	return defaultMarkdown.ConvertToBlocks(source, bwr, opts...)
+}
+
 // A Markdown interface offers functions to convert Markdown text to
 // a desired format.
 type Markdown interface {
 	// Convert interprets a UTF-8 bytes source in Markdown and write rendered
 	// contents to a writer w.
 	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
+	ConvertToBlocks(source []byte, bwr BlocksWriter, opts ...parser.ParseOption) error
 
 	// Parser returns a Parser that will be used for conversion.
 	Parser() parser.Parser
@@ -93,6 +98,7 @@ func WithRendererOptions(opts ...renderer.Option) Option {
 type markdown struct {
 	parser     parser.Parser
 	renderer   renderer.Renderer
+	blocksRenderer   renderer.BlocksRenderer
 	extensions []Extender
 }
 
@@ -116,6 +122,12 @@ func (m *markdown) Convert(source []byte, writer io.Writer, opts ...parser.Parse
 	reader := text.NewReader(source)
 	doc := m.parser.Parse(reader, opts...)
 	return m.renderer.Render(writer, source, doc)
+}
+
+func (m *markdown) ConvertToBlocks(source []byte, bwr BlocksWriter, opts ...parser.ParseOption) error {
+	reader := text.NewReader(source)
+	doc := m.parser.Parse(reader, opts...)
+	return m.blocksRenderer.BlocksRender(bwr, source, doc)
 }
 
 func (m *markdown) Parser() parser.Parser {
