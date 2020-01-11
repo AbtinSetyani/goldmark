@@ -58,6 +58,7 @@ type Markdown interface {
 
 	// Parser returns a Renderer that will be used for conversion.
 	Renderer() renderer.Renderer
+	BlocksRenderer() renderer.BlocksRenderer
 
 	// SetRenderer sets a Renderer to this object.
 	SetRenderer(renderer.Renderer)
@@ -133,7 +134,7 @@ func (m *markdown) Convert(source []byte, writer io.Writer, opts ...parser.Parse
 func (m *markdown) ConvertToBlocks(source []byte, opts ...parser.ParseOption) error {
 	//reader := text.NewReader(source)
 	//doc := m.parser.Parse(reader, opts...)
-	bwr := blocksUtil.BlocksWriter{}
+	bwr := blocksUtil.NewBlocksWriter()
 	reader := text.NewReader(source)
 	doc := m.parser.Parse(reader, opts...)
 	err := m.blocksRenderer.BlocksRender(bwr, source, doc)
@@ -154,6 +155,10 @@ func (m *markdown) SetParser(v parser.Parser) {
 
 func (m *markdown) Renderer() renderer.Renderer {
 	return m.renderer
+}
+
+func (m *markdown) BlocksRenderer() renderer.BlocksRenderer {
+	return m.blocksRenderer
 }
 
 func (m *markdown) SetRenderer(v renderer.Renderer) {
