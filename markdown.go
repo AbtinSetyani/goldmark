@@ -2,6 +2,8 @@
 package goldmark
 
 import (
+	"bufio"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"io"
 
 	"github.com/anytypeio/goldmark/parser"
@@ -112,10 +114,14 @@ func New(options ...Option) Markdown {
 	return md
 }
 
-func (m *markdown) Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error {
+func (m *markdown) Convert(source []byte, w io.Writer, opts ...parser.ParseOption) error {
 	reader := text.NewReader(source)
 	doc := m.parser.Parse(reader, opts...)
-	return m.renderer.Render(writer, source, doc)
+
+	writer := bufio.NewWriter(w)
+	BR := blocksUtil.ExtendWriter(writer)
+
+	return m.renderer.Render(BR, source, doc)
 }
 
 func (m *markdown) Parser() parser.Parser {

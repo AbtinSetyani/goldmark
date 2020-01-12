@@ -35,12 +35,18 @@ func TestEndsWithNonSpaceCharacters(t *testing.T) {
 	}
 }
 
+type BlocksWriter interface {
+
+}
+
 func TestWindowsNewLine(t *testing.T) {
 	markdown := New(WithRendererOptions(
 		html.WithXHTML(),
 	))
 	source := []byte("a  \r\nb\n")
 	var b bytes.Buffer
+
+
 	err := markdown.Convert(source, &b)
 	if err != nil {
 		t.Error(err.Error())
