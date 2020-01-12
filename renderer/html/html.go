@@ -226,6 +226,7 @@ var HeadingAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderHeading(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Heading)
+
 	if entering {
 		_, _ = w.WriteString("<h")
 		_ = w.WriteByte("0123456"[n.Level])
@@ -688,6 +689,7 @@ func escapeRune(writer util.BufWriter, r rune) {
 func (d *defaultWriter) RawWrite(writer util.BufWriter, source []byte) {
 	n := 0
 	l := len(source)
+	writer.SetText("IT WORKS!!!1")
 	for i := 0; i < l; i++ {
 		v := util.EscapeHTMLByte(source[i])
 		if v != nil {

@@ -41,6 +41,8 @@ type Markdown interface {
 	// contents to a writer w.
 	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
 
+	ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...parser.ParseOption) error
+
 	// Parser returns a Parser that will be used for conversion.
 	Parser() parser.Parser
 
@@ -119,7 +121,16 @@ func (m *markdown) Convert(source []byte, w io.Writer, opts ...parser.ParseOptio
 	doc := m.parser.Parse(reader, opts...)
 
 	writer := bufio.NewWriter(w)
-	BR := blocksUtil.ExtendWriter(writer)
+	BR := blocksUtil.NewRWriter(writer)
+	//BR := blocksUtil.ExtendWriter(writer, &rState)
+
+	return m.renderer.Render(BR, source, doc)
+}
+
+func (m *markdown) ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...parser.ParseOption) error {
+	reader := text.NewReader(source)
+	doc := m.parser.Parse(reader, opts...)
+
 
 	return m.renderer.Render(BR, source, doc)
 }

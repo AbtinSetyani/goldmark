@@ -760,6 +760,9 @@ type BufWriter interface {
 	WriteByte(c byte) error
 	WriteRune(r rune) (size int, err error)
 	WriteString(s string) (int, error)
+
+	SetText (text string)
+	GetText () string
 }
 
 // A PrioritizedValue struct holds pair of an arbitrary value and a priority.

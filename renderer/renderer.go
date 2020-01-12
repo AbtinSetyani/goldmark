@@ -87,7 +87,7 @@ type NodeRendererFuncRegisterer interface {
 // A Renderer interface renders given AST node to given
 // writer with given Renderer.
 type Renderer interface {
-	Render(w blocksUtil.Writer, source []byte, n ast.Node) error
+	Render(w blocksUtil.RWriter, source []byte, n ast.Node) error
 
 	// AddOptions adds given option to this renderer.
 	AddOptions(...Option)
@@ -132,7 +132,7 @@ func (r *renderer) Register(kind ast.NodeKind, v NodeRendererFunc) {
 }
 
 // Render renders the given AST node to the given writer with the given Renderer.
-func (r *renderer) Render(writer blocksUtil.Writer, source []byte, n ast.Node) error { // @@ writer blocksUtil.Writer
+func (r *renderer) Render(writer blocksUtil.RWriter, source []byte, n ast.Node) error { // @@ writer blocksUtil.Writer
 	r.initSync.Do(func() {
 		r.options = r.config.Options
 		r.config.NodeRenderers.Sort()
