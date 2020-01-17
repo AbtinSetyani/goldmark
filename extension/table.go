@@ -7,6 +7,7 @@ import (
 
 	"github.com/anytypeio/goldmark"
 	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/extension/ast"
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -166,7 +167,7 @@ var TableAttributeFilter = html.GlobalAttributeFilter.Extend(
 	[]byte("width"),       // [Deprecated]
 )
 
-func (r *TableHTMLRenderer) renderTable(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTable(w blocksUtil.RWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<table")
 		if n.Attributes() != nil {
@@ -188,7 +189,7 @@ var TableHeaderAttributeFilter = html.GlobalAttributeFilter.Extend(
 	[]byte("valign"),  // [Deprecated since HTML4] [Obsolete since HTML5]
 )
 
-func (r *TableHTMLRenderer) renderTableHeader(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTableHeader(w blocksUtil.RWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<thead")
 		if n.Attributes() != nil {
@@ -215,7 +216,7 @@ var TableRowAttributeFilter = html.GlobalAttributeFilter.Extend(
 	[]byte("valign"),  // [Obsolete since HTML5]
 )
 
-func (r *TableHTMLRenderer) renderTableRow(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTableRow(w blocksUtil.RWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("<tr")
 		if n.Attributes() != nil {
@@ -274,7 +275,7 @@ var TableTdCellAttributeFilter = html.GlobalAttributeFilter.Extend(
 	[]byte("width"),  // [Deprecated since HTML4] [Obsolete since HTML5]
 )
 
-func (r *TableHTMLRenderer) renderTableCell(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TableHTMLRenderer) renderTableCell(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	n := node.(*ast.TableCell)
 	tag := "td"
 	if n.Parent().Kind() == ast.KindTableHeader {

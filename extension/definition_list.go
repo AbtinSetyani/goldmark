@@ -3,6 +3,7 @@ package extension
 import (
 	"github.com/anytypeio/goldmark"
 	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/extension/ast"
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -199,7 +200,7 @@ func (r *DefinitionListHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFunc
 // DefinitionListAttributeFilter defines attribute names which dl elements can have.
 var DefinitionListAttributeFilter = html.GlobalAttributeFilter
 
-func (r *DefinitionListHTMLRenderer) renderDefinitionList(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *DefinitionListHTMLRenderer) renderDefinitionList(w blocksUtil.RWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<dl")
@@ -217,7 +218,7 @@ func (r *DefinitionListHTMLRenderer) renderDefinitionList(w util.BufWriter, sour
 // DefinitionTermAttributeFilter defines attribute names which dd elements can have.
 var DefinitionTermAttributeFilter = html.GlobalAttributeFilter
 
-func (r *DefinitionListHTMLRenderer) renderDefinitionTerm(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *DefinitionListHTMLRenderer) renderDefinitionTerm(w blocksUtil.RWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<dt")
@@ -235,7 +236,7 @@ func (r *DefinitionListHTMLRenderer) renderDefinitionTerm(w util.BufWriter, sour
 // DefinitionDescriptionAttributeFilter defines attribute names which dd elements can have.
 var DefinitionDescriptionAttributeFilter = html.GlobalAttributeFilter
 
-func (r *DefinitionListHTMLRenderer) renderDefinitionDescription(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *DefinitionListHTMLRenderer) renderDefinitionDescription(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		n := node.(*ast.DefinitionDescription)
 		_, _ = w.WriteString("<dd")

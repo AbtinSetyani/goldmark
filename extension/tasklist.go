@@ -5,6 +5,7 @@ import (
 
 	"github.com/anytypeio/goldmark"
 	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/extension/ast"
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -81,7 +82,7 @@ func (r *TaskCheckBoxHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRe
 	reg.Register(ast.KindTaskCheckBox, r.renderTaskCheckBox)
 }
 
-func (r *TaskCheckBoxHTMLRenderer) renderTaskCheckBox(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *TaskCheckBoxHTMLRenderer) renderTaskCheckBox(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if !entering {
 		return gast.WalkContinue, nil
 	}

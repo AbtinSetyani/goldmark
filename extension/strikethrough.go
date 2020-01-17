@@ -3,6 +3,7 @@ package extension
 import (
 	"github.com/anytypeio/goldmark"
 	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/extension/ast"
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -85,7 +86,7 @@ func (r *StrikethroughHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncR
 // StrikethroughAttributeFilter defines attribute names which dd elements can have.
 var StrikethroughAttributeFilter = html.GlobalAttributeFilter
 
-func (r *StrikethroughHTMLRenderer) renderStrikethrough(w util.BufWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *StrikethroughHTMLRenderer) renderStrikethrough(w blocksUtil.RWriter, source []byte, n gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<del")

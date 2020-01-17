@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/anytypeio/goldmark/ast"
-	"github.com/anytypeio/goldmark/util"
 	"github.com/anytypeio/goldmark/blocksUtil"
+	"github.com/anytypeio/goldmark/util"
 )
 
 // A Config struct is a data structure that holds configuration of the Renderer.
@@ -70,7 +70,7 @@ type SetOptioner interface {
 }
 
 // NodeRendererFunc is a function that renders a given node.
-type NodeRendererFunc func(writer util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
+type NodeRendererFunc func(writer blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error)
 
 // A NodeRenderer interface offers NodeRendererFuncs.
 type NodeRenderer interface {
@@ -155,11 +155,11 @@ func (r *renderer) Render(writer blocksUtil.RWriter, source []byte, n ast.Node) 
 		r.nodeRendererFuncsTmp = nil
 	})
 
-/*	writer, ok := w.(util.BufWriter)
-	if !ok {
-		writer = bufio.NewWriter(w)
-	}
-*/
+	/*	writer, ok := w.(blocksUtil.RWriter)
+		if !ok {
+			writer = bufio.NewWriter(w)
+		}
+	*/
 	err := ast.Walk(n, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		s := ast.WalkStatus(ast.WalkContinue)
 		var err error

@@ -3,7 +3,6 @@ package util
 
 import (
 	"bytes"
-	"io"
 	"net/url"
 	"regexp"
 	"sort"
@@ -749,20 +748,6 @@ func IsHexDecimal(c byte) bool {
 // IsAlphaNumeric returns true if the given character is a alphabet or a numeric, otherwise false.
 func IsAlphaNumeric(c byte) bool {
 	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
-}
-
-// A BufWriter is a subset of the bufio.Writer .
-type BufWriter interface {
-	io.Writer
-	Available() int
-	Buffered() int
-	Flush() error
-	WriteByte(c byte) error
-	WriteRune(r rune) (size int, err error)
-	WriteString(s string) (int, error)
-
-	SetText (text string)
-	GetText () string
 }
 
 // A PrioritizedValue struct holds pair of an arbitrary value and a priority.

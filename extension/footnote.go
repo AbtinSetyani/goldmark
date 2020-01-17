@@ -6,6 +6,7 @@ import (
 
 	"github.com/anytypeio/goldmark"
 	gast "github.com/anytypeio/goldmark/ast"
+	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/extension/ast"
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -240,7 +241,7 @@ func (r *FootnoteHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegist
 	reg.Register(ast.KindFootnoteList, r.renderFootnoteList)
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnoteLink(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnoteLink(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		n := node.(*ast.FootnoteLink)
 		is := strconv.Itoa(n.Index)
@@ -255,7 +256,7 @@ func (r *FootnoteHTMLRenderer) renderFootnoteLink(w util.BufWriter, source []byt
 	return gast.WalkContinue, nil
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnoteBackLink(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnoteBackLink(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	if entering {
 		n := node.(*ast.FootnoteBackLink)
 		is := strconv.Itoa(n.Index)
@@ -268,7 +269,7 @@ func (r *FootnoteHTMLRenderer) renderFootnoteBackLink(w util.BufWriter, source [
 	return gast.WalkContinue, nil
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnote(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnote(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	n := node.(*ast.Footnote)
 	is := strconv.Itoa(n.Index)
 	if entering {
@@ -285,7 +286,7 @@ func (r *FootnoteHTMLRenderer) renderFootnote(w util.BufWriter, source []byte, n
 	return gast.WalkContinue, nil
 }
 
-func (r *FootnoteHTMLRenderer) renderFootnoteList(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
+func (r *FootnoteHTMLRenderer) renderFootnoteList(w blocksUtil.RWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	tag := "section"
 	if r.Config.XHTML {
 		tag = "div"

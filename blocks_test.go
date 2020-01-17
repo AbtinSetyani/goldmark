@@ -20,9 +20,9 @@ func TestConvertBlocks(t *testing.T) {
 	source := []byte("## Hello world!")
 	var b bytes.Buffer
 
-/*	writer := bufio.NewWriter(&b)
+/*
+	writer := bufio.NewWriter(&b)
 	rState := blocksUtil.NewRenderState()
-
 	BR := blocksUtil.ExtendWriter(writer, rState)
 */
 
@@ -37,7 +37,8 @@ func TestConvertBlocks(t *testing.T) {
 
 	fmt.Println("rState:", BR)
 	fmt.Println("b:", b.String())
-/*	if b.String() != "<pre><code>a\n</code></pre>\n" {
+
+	/* if b.String() != "<pre><code>a\n</code></pre>\n" {
 		t.Errorf("%s \n---------\n %s", source, b.String())
 	}*/
 }
