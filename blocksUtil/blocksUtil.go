@@ -23,22 +23,53 @@ type RWriter interface {
 	AddTextToBuffer(s string)
 	OpenNewBlock(content model.IsBlockContent)
 	CloseCurrentBlock()
+	CloseTextBlock()
+	GetBlocks() []*model.Block
+
+	GetBlockTest() *model.Block
+	OpenNewTextBlock (model.BlockContentTextStyle)
 
 	SetIsNumberedList(isNumbered bool)
 	GetIsNumberedList() (isNumbered bool)
 }
 
+type contentBuff struct {
+
+}
+
 type rWriter struct {
 	*bufio.Writer
 
-	isCurrentBlock     bool
-	isNumberedList     bool
-	blockBuffer        *model.Block
-	textBuffer         string
-	marksBuffer        []model.BlockContentTextMark
-	blocksList         []model.Block
-	blockContentText   model.BlockContentText
+	isNumberedList    bool
 
+	textBuffer        string
+	marksBuffer       []*model.BlockContentTextMark
+	textStylesQueue   []model.BlockContentTextStyle
+	blocks            []*model.Block
+}
+
+func (rw *rWriter) AddMark (mark model.BlockContentTextMark) {
+	rw.marksBuffer = append(rw.marksBuffer, &mark)
+}
+
+func (rw *rWriter) OpenNewTextBlock (style model.BlockContentTextStyle) {
+	rw.textStylesQueue = append(rw.textStylesQueue, style)
+}
+
+func (rw *rWriter) GetBlockTest() *model.Block {
+	newBlock := model.Block{
+		Content: &model.BlockContentOfText{
+			Text: &model.BlockContentText{
+				//TODO Style: content.style,
+				Text: "123123",
+			},
+		},
+	}
+	return &newBlock
+}
+
+func (rw *rWriter) GetBlocks() []*model.Block {
+	return rw.blocks
 }
 
 func (rw *rWriter) SetIsNumberedList (isNumbered bool) {
@@ -62,27 +93,30 @@ func (rw *rWriter) AddTextToBuffer (text string) {
 }
 
 func (rw *rWriter) CloseCurrentBlock() {
-/*	rw.isCurrentBlock = false
+}
+
+func (rw *rWriter) CloseTextBlock() {
+	s := rw.textStylesQueue
+	var style model.BlockContentTextStyle;
+
+	if len(rw.textStylesQueue) > 0 {
+		style, rw.textStylesQueue = s[len(s)-1], s[:len(s)-1]
+	}
 
 	newBlock := model.Block{
 		Content: &model.BlockContentOfText{
-			Text: &rw.blockContentText,
+			Text: &model.BlockContentText{
+				Text: rw.textBuffer,
+				Style: style,
+				Marks: &model.BlockContentTextMarks{
+					Marks: rw.marksBuffer,
+				},
+			},
 		},
 	}
-
-	rw.blocksList = append(rw.blocksList, newBlock)
-	rw.blockBuffer = &model.Block{}
-	rw.textBuffer = ""*/
+	rw.blocks = append(rw.blocks, &newBlock)
+	rw.textBuffer = ""
 }
 
 func (rw *rWriter) OpenNewBlock(content model.IsBlockContent) {
-	/*	if rw.isCurrentBlock {
-			rw.CloseCurrentBlock()
-		}
-		rw.isCurrentBlock = true
-		rw.blockBuffer = &model.Block{
-			//Id: "3",
-			Content: content,
-		}
-	}*/
 }

@@ -237,13 +237,9 @@ func (r *Renderer) renderHeading(w blocksUtil.RWriter, source []byte, node ast.N
 	}
 
 	if entering {
-		w.OpenNewBlock(&model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				Style: style,
-			},
-		})
+		w.OpenNewTextBlock(style)
 	} else {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -255,13 +251,9 @@ var BlockquoteAttributeFilter = GlobalAttributeFilter.Extend(
 
 func (r *Renderer) renderBlockquote(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.OpenNewBlock(&model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				Style: model.BlockContentText_Quote,
-			},
-		})
+		w.OpenNewTextBlock(model.BlockContentText_Quote)
 	} else {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -278,13 +270,9 @@ func (r *Renderer) renderCodeBlock(w blocksUtil.RWriter, source []byte, n ast.No
 
 func (r *Renderer) renderFencedCodeBlock(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.OpenNewBlock(&model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				Style: model.BlockContentText_Code,
-			},
-		})
+		w.OpenNewTextBlock(model.BlockContentText_Code)
 	} else {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -324,13 +312,9 @@ func (r *Renderer) renderListItem(w blocksUtil.RWriter, source []byte, n ast.Nod
 	}
 
 	if entering {
-		w.OpenNewBlock(&model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				Style: tag,
-			},
-		})
+		w.OpenNewTextBlock(tag)
 	} else {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -340,13 +324,9 @@ var ParagraphAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderParagraph(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.OpenNewBlock(&model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				Style: model.BlockContentText_Paragraph,
-			},
-		})
+		w.OpenNewTextBlock(model.BlockContentText_Paragraph)
 	} else {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -354,7 +334,7 @@ func (r *Renderer) renderParagraph(w blocksUtil.RWriter, source []byte, n ast.No
 func (r *Renderer) renderTextBlock(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		// TODO: check it
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -370,7 +350,7 @@ var ThematicAttributeFilter = GlobalAttributeFilter.Extend(
 
 func (r *Renderer) renderThematicBreak(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 	}
 
 	return ast.WalkContinue, nil
@@ -524,7 +504,7 @@ func (r *Renderer) renderText(w blocksUtil.RWriter, source []byte, node ast.Node
 
 	r.Writer.Write(w, segment.Value(source))
 	if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
-		w.CloseCurrentBlock()
+		w.CloseTextBlock()
 
 	} else if n.SoftLineBreak() {
 		w.AddTextToBuffer("\n")

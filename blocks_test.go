@@ -17,28 +17,17 @@ func TestConvertBlocks(t *testing.T) {
 		html.WithXHTML(),
 		html.WithUnsafe(),
 	))
-	source := []byte("## Hello world!")
+	source := []byte("## Hello world!\n Ololololo \n\n 123123")
 	var b bytes.Buffer
-
-/*
-	writer := bufio.NewWriter(&b)
-	rState := blocksUtil.NewRenderState()
-	BR := blocksUtil.ExtendWriter(writer, rState)
-*/
 
 	writer := bufio.NewWriter(&b)
 	BR := blocksUtil.NewRWriter(writer)
-
 
 	err := markdown.ConvertBlocks(source, BR)
 	if err != nil {
 		t.Error(err.Error())
 	}
 
-	fmt.Println("rState:", BR)
+	fmt.Println("rState:", BR.GetBlocks())
 	fmt.Println("b:", b.String())
-
-	/* if b.String() != "<pre><code>a\n</code></pre>\n" {
-		t.Errorf("%s \n---------\n %s", source, b.String())
-	}*/
 }
