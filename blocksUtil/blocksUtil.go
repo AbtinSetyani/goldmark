@@ -4,7 +4,6 @@ package blocksUtil
 import (
 	"bufio"
 	"github.com/anytypeio/go-anytype-library/pb/model"
-	"github.com/anytypeio/go-anytype-middleware/core/block/simple/text"
 	"io"
 )
 
@@ -24,17 +23,30 @@ type RWriter interface {
 	AddTextToBuffer(s string)
 	OpenNewBlock(content model.IsBlockContent)
 	CloseCurrentBlock()
+
+	SetIsNumberedList(isNumbered bool)
+	GetIsNumberedList() (isNumbered bool)
 }
 
 type rWriter struct {
 	*bufio.Writer
 
-	isCurrentBlock bool
+	isCurrentBlock     bool
+	isNumberedList     bool
 	blockBuffer        *model.Block
 	textBuffer         string
 	marksBuffer        []model.BlockContentTextMark
 	blocksList         []model.Block
 	blockContentText   model.BlockContentText
+
+}
+
+func (rw *rWriter) SetIsNumberedList (isNumbered bool) {
+	rw.isNumberedList = isNumbered
+}
+
+func (rw *rWriter) GetIsNumberedList() (isNumbered bool) {
+	return rw.isNumberedList
 }
 
 func NewRWriter (writer *bufio.Writer) RWriter {
@@ -50,7 +62,7 @@ func (rw *rWriter) AddTextToBuffer (text string) {
 }
 
 func (rw *rWriter) CloseCurrentBlock() {
-	rw.isCurrentBlock = false
+/*	rw.isCurrentBlock = false
 
 	newBlock := model.Block{
 		Content: &model.BlockContentOfText{
@@ -60,28 +72,17 @@ func (rw *rWriter) CloseCurrentBlock() {
 
 	rw.blocksList = append(rw.blocksList, newBlock)
 	rw.blockBuffer = &model.Block{}
-	rw.textBuffer = ""
+	rw.textBuffer = ""*/
 }
 
 func (rw *rWriter) OpenNewBlock(content model.IsBlockContent) {
-	if rw.isCurrentBlock {
-		rw.CloseCurrentBlock()
-	}
-	rw.isCurrentBlock = true
-	rw.blockBuffer = &model.Block{
-		//Id: "3",
-		Content: content,
-	}
-}
-
-
-func (rw *rWriter) OpenNewTextBlock(content model.IsBlockContent) {
-	if rw.isCurrentBlock {
-		rw.CloseCurrentBlock()
-	}
-	rw.isCurrentBlock = true
-	rw.blockBuffer = &model.Block{
-		//Id: "3",
-		Content: content,
-	}
+	/*	if rw.isCurrentBlock {
+			rw.CloseCurrentBlock()
+		}
+		rw.isCurrentBlock = true
+		rw.blockBuffer = &model.Block{
+			//Id: "3",
+			Content: content,
+		}
+	}*/
 }

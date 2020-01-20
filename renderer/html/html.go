@@ -2,10 +2,7 @@ package html
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
-	"strconv"
-
 	"github.com/anytypeio/goldmark/ast"
 	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/renderer"
@@ -227,10 +224,22 @@ func (r *Renderer) renderDocument(w blocksUtil.RWriter, source []byte, node ast.
 var HeadingAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderHeading(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	n := node.(*ast.Heading)
+
+	var style model.BlockContentTextStyle;
+	switch "0123456"[n.Level] {
+	case 1: style = model.BlockContentText_Header1
+	case 2: style = model.BlockContentText_Header2
+	case 3: style = model.BlockContentText_Header3
+	case 4: style = model.BlockContentText_Header4
+	case 5: style = model.BlockContentText_Header4
+	case 6: style = model.BlockContentText_Header4
+	}
+
 	if entering {
 		w.OpenNewBlock(&model.BlockContentOfText{
 			Text: &model.BlockContentText{
-				Style: model.BlockContentText_Header2, // TODO: "0123456"[n.Level]
+				Style: style,
 			},
 		})
 	} else {
@@ -246,69 +255,42 @@ var BlockquoteAttributeFilter = GlobalAttributeFilter.Extend(
 
 func (r *Renderer) renderBlockquote(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		if n.Attributes() != nil {
-			_, _ = w.WriteString("<blockquote")
-			RenderAttributes(w, n, BlockquoteAttributeFilter)
-			_ = w.WriteByte('>')
-		} else {
-			_, _ = w.WriteString("<blockquote>\n")
-		}
+		w.OpenNewBlock(&model.BlockContentOfText{
+			Text: &model.BlockContentText{
+				Style: model.BlockContentText_Quote,
+			},
+		})
 	} else {
-		_, _ = w.WriteString("</blockquote>\n")
+		w.CloseCurrentBlock()
 	}
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderCodeBlock(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("<pre><code>")
-		r.writeLines(w, source, n)
+		// TODO: start code markup
 	} else {
-		_, _ = w.WriteString("</code></pre>\n")
+		// TODO: end code markup
 	}
+
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderFencedCodeBlock(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	n := node.(*ast.FencedCodeBlock)
 	if entering {
-		_, _ = w.WriteString("<pre><code")
-		language := n.Language(source)
-		if language != nil {
-			_, _ = w.WriteString(" class=\"language-")
-			r.Writer.Write(w, language)
-			_, _ = w.WriteString("\"")
-		}
-		_ = w.WriteByte('>')
-		r.writeLines(w, source, n)
+		w.OpenNewBlock(&model.BlockContentOfText{
+			Text: &model.BlockContentText{
+				Style: model.BlockContentText_Code,
+			},
+		})
 	} else {
-		_, _ = w.WriteString("</code></pre>\n")
+		w.CloseCurrentBlock()
 	}
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderHTMLBlock(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	n := node.(*ast.HTMLBlock)
-	if entering {
-		if r.Unsafe {
-			l := n.Lines().Len()
-			for i := 0; i < l; i++ {
-				line := n.Lines().At(i)
-				_, _ = w.Write(line.Value(source))
-			}
-		} else {
-			_, _ = w.WriteString("<!-- raw HTML omitted -->\n")
-		}
-	} else {
-		if n.HasClosure() {
-			if r.Unsafe {
-				closure := n.ClosureLine
-				_, _ = w.Write(closure.Value(source))
-			} else {
-				_, _ = w.WriteString("<!-- raw HTML omitted -->\n")
-			}
-		}
-	}
+	// Do not render
 	return ast.WalkContinue, nil
 }
 
@@ -320,25 +302,13 @@ var ListAttributeFilter = GlobalAttributeFilter.Extend(
 
 func (r *Renderer) renderList(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.List)
-	tag := "ul"
-	if n.IsOrdered() {
-		tag = "ol"
-	}
-	if entering {
-		_ = w.WriteByte('<')
-		_, _ = w.WriteString(tag)
-		if n.IsOrdered() && n.Start != 1 {
-			fmt.Fprintf(w, " start=\"%d\"", n.Start)
-		}
-		if n.Attributes() != nil {
-			RenderAttributes(w, n, ListAttributeFilter)
-		}
-		_, _ = w.WriteString(">\n")
+
+	if n.IsOrdered() && entering {
+		w.SetIsNumberedList(true)
 	} else {
-		_, _ = w.WriteString("</")
-		_, _ = w.WriteString(tag)
-		_, _ = w.WriteString(">\n")
+		w.SetIsNumberedList(false)
 	}
+
 	return ast.WalkContinue, nil
 }
 
@@ -348,22 +318,19 @@ var ListItemAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *Renderer) renderListItem(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	tag := model.BlockContentText_Marked
+	if w.GetIsNumberedList() {
+		tag = model.BlockContentText_Numbered
+	}
+
 	if entering {
-		if n.Attributes() != nil {
-			_, _ = w.WriteString("<li")
-			RenderAttributes(w, n, ListItemAttributeFilter)
-			_ = w.WriteByte('>')
-		} else {
-			_, _ = w.WriteString("<li>")
-		}
-		fc := n.FirstChild()
-		if fc != nil {
-			if _, ok := fc.(*ast.TextBlock); !ok {
-				_ = w.WriteByte('\n')
-			}
-		}
+		w.OpenNewBlock(&model.BlockContentOfText{
+			Text: &model.BlockContentText{
+				Style: tag,
+			},
+		})
 	} else {
-		_, _ = w.WriteString("</li>\n")
+		w.CloseCurrentBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -373,24 +340,21 @@ var ParagraphAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderParagraph(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		if n.Attributes() != nil {
-			_, _ = w.WriteString("<p")
-			RenderAttributes(w, n, ParagraphAttributeFilter)
-			_ = w.WriteByte('>')
-		} else {
-			_, _ = w.WriteString("<p>")
-		}
+		w.OpenNewBlock(&model.BlockContentOfText{
+			Text: &model.BlockContentText{
+				Style: model.BlockContentText_Paragraph,
+			},
+		})
 	} else {
-		_, _ = w.WriteString("</p>\n")
+		w.CloseCurrentBlock()
 	}
 	return ast.WalkContinue, nil
 }
 
 func (r *Renderer) renderTextBlock(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
-		if _, ok := n.NextSibling().(ast.Node); ok && n.FirstChild() != nil {
-			_ = w.WriteByte('\n')
-		}
+		// TODO: check it
+		w.CloseCurrentBlock()
 	}
 	return ast.WalkContinue, nil
 }
@@ -405,18 +369,10 @@ var ThematicAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *Renderer) renderThematicBreak(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
-	if !entering {
-		return ast.WalkContinue, nil
+	if entering {
+		w.CloseCurrentBlock()
 	}
-	_, _ = w.WriteString("<hr")
-	if n.Attributes() != nil {
-		RenderAttributes(w, n, ThematicAttributeFilter)
-	}
-	if r.XHTML {
-		_, _ = w.WriteString(" />\n")
-	} else {
-		_, _ = w.WriteString(">\n")
-	}
+
 	return ast.WalkContinue, nil
 }
 
@@ -438,22 +394,14 @@ func (r *Renderer) renderAutoLink(w blocksUtil.RWriter, source []byte, node ast.
 	if !entering {
 		return ast.WalkContinue, nil
 	}
-	_, _ = w.WriteString(`<a href="`)
-	url := n.URL(source)
+
+	// TODO: START A markup
+	// TODO: SET URL
+	// url := n.URL(source)
+
 	label := n.Label(source)
-	if n.AutoLinkType == ast.AutoLinkEmail && !bytes.HasPrefix(bytes.ToLower(url), []byte("mailto:")) {
-		_, _ = w.WriteString("mailto:")
-	}
-	_, _ = w.Write(util.EscapeHTML(util.URLEscape(url, false)))
-	if n.Attributes() != nil {
-		_ = w.WriteByte('"')
-		RenderAttributes(w, n, LinkAttributeFilter)
-		_ = w.WriteByte('>')
-	} else {
-		_, _ = w.WriteString(`">`)
-	}
 	_, _ = w.Write(util.EscapeHTML(label))
-	_, _ = w.WriteString(`</a>`)
+	// TODO: CLOSE A markup
 	return ast.WalkContinue, nil
 }
 
@@ -461,7 +409,8 @@ func (r *Renderer) renderAutoLink(w blocksUtil.RWriter, source []byte, node ast.
 var CodeAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderCodeSpan(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
-	if entering {
+	// TODO
+	/*	if entering {
 		if n.Attributes() != nil {
 			_, _ = w.WriteString("<code")
 			RenderAttributes(w, n, CodeAttributeFilter)
@@ -483,7 +432,7 @@ func (r *Renderer) renderCodeSpan(w blocksUtil.RWriter, source []byte, n ast.Nod
 		}
 		return ast.WalkSkipChildren, nil
 	}
-	_, _ = w.WriteString("</code>")
+	_, _ = w.WriteString("</code>")*/
 	return ast.WalkContinue, nil
 }
 
@@ -491,22 +440,10 @@ func (r *Renderer) renderCodeSpan(w blocksUtil.RWriter, source []byte, n ast.Nod
 var EmphasisAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderEmphasis(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	n := node.(*ast.Emphasis)
-	tag := "em"
-	if n.Level == 2 {
-		tag = "strong"
-	}
 	if entering {
-		_ = w.WriteByte('<')
-		_, _ = w.WriteString(tag)
-		if n.Attributes() != nil {
-			RenderAttributes(w, n, EmphasisAttributeFilter)
-		}
-		_ = w.WriteByte('>')
+		// TODO: START B MARKUP
 	} else {
-		_, _ = w.WriteString("</")
-		_, _ = w.WriteString(tag)
-		_ = w.WriteByte('>')
+		// TODO: END B MARKUP
 	}
 	return ast.WalkContinue, nil
 }
@@ -514,22 +451,14 @@ func (r *Renderer) renderEmphasis(w blocksUtil.RWriter, source []byte, node ast.
 func (r *Renderer) renderLink(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
 	if entering {
-		_, _ = w.WriteString("<a href=\"")
+		// TODO: START LINK MARKUP
 		if r.Unsafe || !IsDangerousURL(n.Destination) {
-			_, _ = w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
+			// TODO: SET URL
+			// link = util.EscapeHTML(util.URLEscape(n.Destination, true))
 		}
-		_ = w.WriteByte('"')
-		if n.Title != nil {
-			_, _ = w.WriteString(` title="`)
-			r.Writer.Write(w, n.Title)
-			_ = w.WriteByte('"')
-		}
-		if n.Attributes() != nil {
-			RenderAttributes(w, n, LinkAttributeFilter)
-		}
-		_ = w.WriteByte('>')
+
 	} else {
-		_, _ = w.WriteString("</a>")
+		// TODO: END LINK MARKUP
 	}
 	return ast.WalkContinue, nil
 }
@@ -553,7 +482,8 @@ var ImageAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *Renderer) renderImage(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	if !entering {
+	// TODO
+	/*	if !entering {
 		return ast.WalkContinue, nil
 	}
 	n := node.(*ast.Image)
@@ -576,24 +506,12 @@ func (r *Renderer) renderImage(w blocksUtil.RWriter, source []byte, node ast.Nod
 		_, _ = w.WriteString(" />")
 	} else {
 		_, _ = w.WriteString(">")
-	}
+	}*/
 	return ast.WalkSkipChildren, nil
 }
 
 func (r *Renderer) renderRawHTML(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	if !entering {
-		return ast.WalkSkipChildren, nil
-	}
-	if r.Unsafe {
-		n := node.(*ast.RawHTML)
-		l := n.Segments.Len()
-		for i := 0; i < l; i++ {
-			segment := n.Segments.At(i)
-			_, _ = w.Write(segment.Value(source))
-		}
-		return ast.WalkSkipChildren, nil
-	}
-	_, _ = w.WriteString("<!-- raw HTML omitted -->")
+	// DO NOT RENDER
 	return ast.WalkSkipChildren, nil
 }
 
@@ -603,19 +521,13 @@ func (r *Renderer) renderText(w blocksUtil.RWriter, source []byte, node ast.Node
 	}
 	n := node.(*ast.Text)
 	segment := n.Segment
-	if n.IsRaw() {
-		r.Writer.RawWrite(w, segment.Value(source))
-	} else {
-		r.Writer.Write(w, segment.Value(source))
-		if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
-			if r.XHTML {
-				_, _ = w.WriteString("<br />\n")
-			} else {
-				_, _ = w.WriteString("<br>\n")
-			}
-		} else if n.SoftLineBreak() {
-			_ = w.WriteByte('\n')
-		}
+
+	r.Writer.Write(w, segment.Value(source))
+	if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
+		w.CloseCurrentBlock()
+
+	} else if n.SoftLineBreak() {
+		w.AddTextToBuffer("\n")
 	}
 	return ast.WalkContinue, nil
 }
@@ -625,15 +537,9 @@ func (r *Renderer) renderString(w blocksUtil.RWriter, source []byte, node ast.No
 		return ast.WalkContinue, nil
 	}
 	n := node.(*ast.String)
-	if n.IsCode() {
-		_, _ = w.Write(n.Value)
-	} else {
-		if n.IsRaw() {
-			r.Writer.RawWrite(w, n.Value)
-		} else {
-			r.Writer.Write(w, n.Value)
-		}
-	}
+
+	w.AddTextToBuffer(string(n.Value))
+
 	return ast.WalkContinue, nil
 }
 
@@ -688,75 +594,7 @@ func (d *defaultWriter) RawWrite(writer blocksUtil.RWriter, source []byte) {
 }
 
 func (d *defaultWriter) Write(writer blocksUtil.RWriter, source []byte) {
-	escaped := false
-	var ok bool
-	limit := len(source)
-	n := 0
-	for i := 0; i < limit; i++ {
-		c := source[i]
-		if escaped {
-			if util.IsPunct(c) {
-				d.RawWrite(writer, source[n:i-1])
-				n = i
-				escaped = false
-				continue
-			}
-		}
-		if c == '&' {
-			pos := i
-			next := i + 1
-			if next < limit && source[next] == '#' {
-				nnext := next + 1
-				if nnext < limit {
-					nc := source[nnext]
-					// code point like #x22;
-					if nnext < limit && nc == 'x' || nc == 'X' {
-						start := nnext + 1
-						i, ok = util.ReadWhile(source, [2]int{start, limit}, util.IsHexDecimal)
-						if ok && i < limit && source[i] == ';' {
-							v, _ := strconv.ParseUint(util.BytesToReadOnlyString(source[start:i]), 16, 32)
-							d.RawWrite(writer, source[n:pos])
-							n = i + 1
-							escapeRune(writer, rune(v))
-							continue
-						}
-						// code point like #1234;
-					} else if nc >= '0' && nc <= '9' {
-						start := nnext
-						i, ok = util.ReadWhile(source, [2]int{start, limit}, util.IsNumeric)
-						if ok && i < limit && i-start < 8 && source[i] == ';' {
-							v, _ := strconv.ParseUint(util.BytesToReadOnlyString(source[start:i]), 0, 32)
-							d.RawWrite(writer, source[n:pos])
-							n = i + 1
-							escapeRune(writer, rune(v))
-							continue
-						}
-					}
-				}
-			} else {
-				start := next
-				i, ok = util.ReadWhile(source, [2]int{start, limit}, util.IsAlphaNumeric)
-				// entity reference
-				if ok && i < limit && source[i] == ';' {
-					name := util.BytesToReadOnlyString(source[start:i])
-					entity, ok := util.LookUpHTML5EntityByName(name)
-					if ok {
-						d.RawWrite(writer, source[n:pos])
-						n = i + 1
-						d.RawWrite(writer, entity.Characters)
-						continue
-					}
-				}
-			}
-			i = next - 1
-		}
-		if c == '\\' {
-			escaped = true
-			continue
-		}
-		escaped = false
-	}
-	d.RawWrite(writer, source[n:])
+	writer.AddTextToBuffer(string(source))
 }
 
 // DefaultWriter is a default implementation of the Writer.
