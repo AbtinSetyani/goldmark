@@ -17,7 +17,7 @@ func TestConvertBlocks(t *testing.T) {
 		html.WithXHTML(),
 		html.WithUnsafe(),
 	))
-	source := []byte("## Hello world!\n Ololololo \n\n 123123")
+	source := []byte("## Hello world!\n Olol*ol*olo \n\n 123123")
 	var b bytes.Buffer
 
 	writer := bufio.NewWriter(&b)

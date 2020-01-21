@@ -375,13 +375,18 @@ func (r *Renderer) renderAutoLink(w blocksUtil.RWriter, source []byte, node ast.
 		return ast.WalkContinue, nil
 	}
 
-	// TODO: START A markup
-	// TODO: SET URL
-	// url := n.URL(source)
-
 	label := n.Label(source)
+	w.SetMarkStart()
+
+	start := int32(len(w.GetText()))
+	labelLength := int32(len(label))
+	w.AddMark(model.BlockContentTextMark{
+		Range: &model.Range{ From:start, To:start + labelLength },
+		Type: model.BlockContentTextMark_Link,
+		Param: string(n.URL(source)),
+	})
+
 	_, _ = w.Write(util.EscapeHTML(label))
-	// TODO: CLOSE A markup
 	return ast.WalkContinue, nil
 }
 
@@ -420,10 +425,21 @@ func (r *Renderer) renderCodeSpan(w blocksUtil.RWriter, source []byte, n ast.Nod
 var EmphasisAttributeFilter = GlobalAttributeFilter
 
 func (r *Renderer) renderEmphasis(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	n := node.(*ast.Emphasis)
+	tag := model.BlockContentTextMark_Italic
+	if n.Level == 2 {
+		tag = model.BlockContentTextMark_Bold
+	}
+
 	if entering {
-		// TODO: START B MARKUP
+		w.SetMarkStart()
 	} else {
-		// TODO: END B MARKUP
+		to := int32(len(w.GetText()))
+
+		w.AddMark(model.BlockContentTextMark{
+			Range: &model.Range{ From:int32(w.GetMarkStart()), To:to },
+			Type: tag,
+		})
 	}
 	return ast.WalkContinue, nil
 }

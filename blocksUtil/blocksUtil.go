@@ -26,6 +26,11 @@ type RWriter interface {
 	CloseTextBlock()
 	GetBlocks() []*model.Block
 
+	GetMarkStart () int
+	SetMarkStart ()
+
+	AddMark (mark model.BlockContentTextMark)
+
 	GetBlockTest() *model.Block
 	OpenNewTextBlock (model.BlockContentTextStyle)
 
@@ -44,11 +49,23 @@ type rWriter struct {
 
 	textBuffer        string
 	marksBuffer       []*model.BlockContentTextMark
+	marksStartQueue   []int
 	textStylesQueue   []model.BlockContentTextStyle
 	blocks            []*model.Block
 }
 
+func (rw *rWriter) SetMarkStart () {
+	rw.marksStartQueue = append(rw.marksStartQueue, len(rw.textBuffer))
+}
+
+func (rw *rWriter) GetMarkStart () int {
+	return rw.marksStartQueue[len(rw.marksStartQueue) - 1]
+}
+
+
 func (rw *rWriter) AddMark (mark model.BlockContentTextMark) {
+	s := rw.marksStartQueue
+	rw.marksStartQueue = s[:len(s)-1]
 	rw.marksBuffer = append(rw.marksBuffer, &mark)
 }
 
@@ -115,6 +132,8 @@ func (rw *rWriter) CloseTextBlock() {
 		},
 	}
 	rw.blocks = append(rw.blocks, &newBlock)
+	rw.marksStartQueue = []int{}
+	rw.marksBuffer = []*model.BlockContentTextMark{}
 	rw.textBuffer = ""
 }
 
