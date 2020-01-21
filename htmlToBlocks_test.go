@@ -32,16 +32,16 @@ func readAll() (string, error) {
 	return string(out), nil
 }
 
-func TestConvertHTMLToBlocks(t *testing.T) {
-	type commonmarkSpecTestCase struct {
-		HTML      string `json:"html"`
-	}
+type TestCase struct {
+	HTML      string `json:"html"`
+}
 
+func TestConvertHTMLToBlocks(t *testing.T) {
 	bs, err := ioutil.ReadFile("_test/spec.json")
 	if err != nil {
 		panic(err)
 	}
-	var testCases []commonmarkSpecTestCase
+	var testCases []TestCase
 	if err := json.Unmarshal(bs, &testCases); err != nil {
 		panic(err)
 	}
@@ -65,6 +65,23 @@ func TestConvertHTMLToBlocks(t *testing.T) {
 	//sample1 := "<body><h1>My First Heading</h1><p>My first paragraph.</p></body>"
 
 	//convertToBlocksAndPrint(sample1)
+}
+
+func TestConvertHTMLToBlocks2(t *testing.T) {
+	bs, err := ioutil.ReadFile("_test/spec.json")
+	if err != nil {
+		panic(err)
+	}
+	var testCases []TestCase
+	if err := json.Unmarshal(bs, &testCases); err != nil {
+		panic(err)
+	}
+
+	for i, c := range testCases {
+		mdToBlocksConverter := goldmark.New()
+		_, blocks := mdToBlocksConverter.HTMLToBlocks([]byte(c.HTML))
+		fmt.Println(i, "html:", c.HTML, " blocks:", blocks)
+	}
 }
 
 func convertToBlocksAndPrint (html string) error {

@@ -3,6 +3,9 @@ package goldmark
 
 import (
 	"bufio"
+	"bytes"
+	htmlToMdConverter "gitea.com/lunny/html2md"
+	"github.com/anytypeio/go-anytype-library/pb/model"
 	"github.com/anytypeio/goldmark/blocksUtil"
 	"io"
 
@@ -42,6 +45,7 @@ type Markdown interface {
 	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
 
 	ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...parser.ParseOption) error
+	HTMLToBlocks(source []byte) (error, []*model.Block)
 
 	// Parser returns a Parser that will be used for conversion.
 	Parser() parser.Parser
@@ -133,6 +137,21 @@ func (m *markdown) ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...p
 
 
 	return m.renderer.Render(BR, source, doc)
+}
+
+func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
+	md := htmlToMdConverter.Convert(string(source))
+
+	var b bytes.Buffer
+	writer := bufio.NewWriter(&b)
+	BR := blocksUtil.NewRWriter(writer)
+
+	err := m.ConvertBlocks([]byte(md), BR)
+	if err != nil {
+		return err, nil
+	}
+
+	return nil, BR.GetBlocks()
 }
 
 func (m *markdown) Parser() parser.Parser {
