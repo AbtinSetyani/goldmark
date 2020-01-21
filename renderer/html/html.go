@@ -446,15 +446,22 @@ func (r *Renderer) renderEmphasis(w blocksUtil.RWriter, source []byte, node ast.
 
 func (r *Renderer) renderLink(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
+	link := ""
 	if entering {
-		// TODO: START LINK MARKUP
+		w.SetMarkStart()
+
 		if r.Unsafe || !IsDangerousURL(n.Destination) {
-			// TODO: SET URL
-			// link = util.EscapeHTML(util.URLEscape(n.Destination, true))
+			link = string(util.EscapeHTML(util.URLEscape(n.Destination, true)))
 		}
 
 	} else {
-		// TODO: END LINK MARKUP
+		to := int32(len(w.GetText()))
+
+		w.AddMark(model.BlockContentTextMark{
+			Range: &model.Range{ From:int32(w.GetMarkStart()), To:to },
+			Type: model.BlockContentTextMark_Link,
+			Param: link,
+		})
 	}
 	return ast.WalkContinue, nil
 }
@@ -545,7 +552,8 @@ var dataPrefix = []byte("data-")
 // You can specify attribute names to render by the filter.
 // If filter is nil, RenderAttributes renders all attributes.
 func RenderAttributes(w blocksUtil.RWriter, node ast.Node, filter util.BytesFilter) {
-	for _, attr := range node.Attributes() {
+	// TODO: Do we need attributes?
+/*	for _, attr := range node.Attributes() {
 		if filter != nil && !filter.Contains(attr.Name) {
 			if !bytes.HasPrefix(attr.Name, dataPrefix) {
 				continue
@@ -557,7 +565,7 @@ func RenderAttributes(w blocksUtil.RWriter, node ast.Node, filter util.BytesFilt
 		// TODO: convert numeric values to strings
 		_, _ = w.Write(util.EscapeHTML(attr.Value.([]byte)))
 		_ = w.WriteByte('"')
-	}
+	}*/
 }
 
 // A Writer interface wirtes textual contents to a writer.
