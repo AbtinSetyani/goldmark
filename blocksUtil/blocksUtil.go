@@ -65,7 +65,15 @@ func (rw *rWriter) GetMarkStart () int {
 func (rw *rWriter) AddMark (mark model.BlockContentTextMark) {
 	s := rw.marksStartQueue
 	rw.marksStartQueue = s[:len(s)-1]
-	rw.marksBuffer = append(rw.marksBuffer, &mark)
+
+	// IMPORTANT: ignore if current block is not support markup.
+	if  rw.textStylesQueue[len(rw.textStylesQueue) - 1] != model.BlockContentText_Header1 &&
+	    rw.textStylesQueue[len(rw.textStylesQueue) - 1] != model.BlockContentText_Header2 &&
+		rw.textStylesQueue[len(rw.textStylesQueue) - 1] != model.BlockContentText_Header3 &&
+		rw.textStylesQueue[len(rw.textStylesQueue) - 1] != model.BlockContentText_Header4 {
+
+		rw.marksBuffer = append(rw.marksBuffer, &mark)
+	}
 }
 
 func (rw *rWriter) OpenNewTextBlock (style model.BlockContentTextStyle) {
@@ -96,9 +104,6 @@ func (rw *rWriter) AddTextToBuffer (text string) {
 	rw.textBuffer += text
 }
 
-func (rw *rWriter) CloseCurrentBlock() {
-}
-
 func (rw *rWriter) CloseTextBlock(content model.BlockContentTextStyle) {
 	var style = content;
 
@@ -117,7 +122,11 @@ func (rw *rWriter) CloseTextBlock(content model.BlockContentTextStyle) {
 			},
 		},
 	}
-	rw.blocks = append(rw.blocks, &newBlock)
+
+	// IMPORTANT: do not create a new block if textBuffer is empty
+	if len(rw.textBuffer) > 0 {
+		rw.blocks = append(rw.blocks, &newBlock)
+	}
 	rw.marksStartQueue = []int{}
 	rw.marksBuffer = []*model.BlockContentTextMark{}
 	rw.textBuffer = ""
@@ -131,21 +140,7 @@ func (rw *rWriter) ForceCloseTextBlock() {
 		style, rw.textStylesQueue = s[len(s)-1], s[:len(s)-1]
 	}
 
-	newBlock := model.Block{
-		Content: &model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				Text: rw.textBuffer,
-				Style: style,
-				Marks: &model.BlockContentTextMarks{
-					Marks: rw.marksBuffer,
-				},
-			},
-		},
-	}
-	rw.blocks = append(rw.blocks, &newBlock)
-	rw.marksStartQueue = []int{}
-	rw.marksBuffer = []*model.BlockContentTextMark{}
-	rw.textBuffer = ""
+	rw.CloseTextBlock(style)
 }
 
 
