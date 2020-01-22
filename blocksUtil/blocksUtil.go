@@ -21,9 +21,7 @@ type RWriter interface {
 	// Main part
 	GetText () string
 	AddTextToBuffer(s string)
-	OpenNewBlock(content model.IsBlockContent)
-	CloseCurrentBlock()
-	CloseTextBlock()
+
 	GetBlocks() []*model.Block
 
 	GetMarkStart () int
@@ -31,8 +29,9 @@ type RWriter interface {
 
 	AddMark (mark model.BlockContentTextMark)
 
-	GetBlockTest() *model.Block
 	OpenNewTextBlock (model.BlockContentTextStyle)
+	CloseTextBlock(model.BlockContentTextStyle)
+	ForceCloseTextBlock()
 
 	SetIsNumberedList(isNumbered bool)
 	GetIsNumberedList() (isNumbered bool)
@@ -73,18 +72,6 @@ func (rw *rWriter) OpenNewTextBlock (style model.BlockContentTextStyle) {
 	rw.textStylesQueue = append(rw.textStylesQueue, style)
 }
 
-func (rw *rWriter) GetBlockTest() *model.Block {
-	newBlock := model.Block{
-		Content: &model.BlockContentOfText{
-			Text: &model.BlockContentText{
-				//TODO Style: content.style,
-				Text: "123123",
-			},
-		},
-	}
-	return &newBlock
-}
-
 func (rw *rWriter) GetBlocks() []*model.Block {
 	return rw.blocks
 }
@@ -112,9 +99,33 @@ func (rw *rWriter) AddTextToBuffer (text string) {
 func (rw *rWriter) CloseCurrentBlock() {
 }
 
-func (rw *rWriter) CloseTextBlock() {
+func (rw *rWriter) CloseTextBlock(content model.BlockContentTextStyle) {
+	var style = content;
+
+	if len(rw.textStylesQueue) > 0 {
+		rw.textStylesQueue = rw.textStylesQueue[:len(rw.textStylesQueue)-1]
+	}
+	//style = model.BlockContentText_Paragraph
+	newBlock := model.Block{
+		Content: &model.BlockContentOfText{
+			Text: &model.BlockContentText{
+				Text: rw.textBuffer,
+				Style: style,
+				Marks: &model.BlockContentTextMarks{
+					Marks: rw.marksBuffer,
+				},
+			},
+		},
+	}
+	rw.blocks = append(rw.blocks, &newBlock)
+	rw.marksStartQueue = []int{}
+	rw.marksBuffer = []*model.BlockContentTextMark{}
+	rw.textBuffer = ""
+}
+
+func (rw *rWriter) ForceCloseTextBlock() {
 	s := rw.textStylesQueue
-	var style model.BlockContentTextStyle;
+	style := model.BlockContentText_Paragraph;
 
 	if len(rw.textStylesQueue) > 0 {
 		style, rw.textStylesQueue = s[len(s)-1], s[:len(s)-1]
@@ -136,6 +147,7 @@ func (rw *rWriter) CloseTextBlock() {
 	rw.marksBuffer = []*model.BlockContentTextMark{}
 	rw.textBuffer = ""
 }
+
 
 func (rw *rWriter) OpenNewBlock(content model.IsBlockContent) {
 }

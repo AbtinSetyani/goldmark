@@ -227,7 +227,7 @@ func (r *Renderer) renderHeading(w blocksUtil.RWriter, source []byte, node ast.N
 	n := node.(*ast.Heading)
 
 	var style model.BlockContentTextStyle;
-	switch "0123456"[n.Level] {
+	switch n.Level {
 	case 1: style = model.BlockContentText_Header1
 	case 2: style = model.BlockContentText_Header2
 	case 3: style = model.BlockContentText_Header3
@@ -239,7 +239,7 @@ func (r *Renderer) renderHeading(w blocksUtil.RWriter, source []byte, node ast.N
 	if entering {
 		w.OpenNewTextBlock(style)
 	} else {
-		w.CloseTextBlock()
+		w.CloseTextBlock(style)
 	}
 	return ast.WalkContinue, nil
 }
@@ -253,7 +253,7 @@ func (r *Renderer) renderBlockquote(w blocksUtil.RWriter, source []byte, n ast.N
 	if entering {
 		w.OpenNewTextBlock(model.BlockContentText_Quote)
 	} else {
-		w.CloseTextBlock()
+		w.CloseTextBlock(model.BlockContentText_Quote)
 	}
 	return ast.WalkContinue, nil
 }
@@ -272,7 +272,7 @@ func (r *Renderer) renderFencedCodeBlock(w blocksUtil.RWriter, source []byte, no
 	if entering {
 		w.OpenNewTextBlock(model.BlockContentText_Code)
 	} else {
-		w.CloseTextBlock()
+		w.CloseTextBlock(model.BlockContentText_Code)
 	}
 	return ast.WalkContinue, nil
 }
@@ -314,7 +314,9 @@ func (r *Renderer) renderListItem(w blocksUtil.RWriter, source []byte, n ast.Nod
 	if entering {
 		w.OpenNewTextBlock(tag)
 	} else {
-		w.CloseTextBlock()
+
+
+		w.CloseTextBlock(tag)
 	}
 	return ast.WalkContinue, nil
 }
@@ -326,7 +328,7 @@ func (r *Renderer) renderParagraph(w blocksUtil.RWriter, source []byte, n ast.No
 	if entering {
 		w.OpenNewTextBlock(model.BlockContentText_Paragraph)
 	} else {
-		w.CloseTextBlock()
+		w.CloseTextBlock(model.BlockContentText_Paragraph)
 	}
 	return ast.WalkContinue, nil
 }
@@ -334,7 +336,7 @@ func (r *Renderer) renderParagraph(w blocksUtil.RWriter, source []byte, n ast.No
 func (r *Renderer) renderTextBlock(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		// TODO: check it
-		w.CloseTextBlock()
+		w.CloseTextBlock(model.BlockContentText_Paragraph)
 	}
 	return ast.WalkContinue, nil
 }
@@ -350,7 +352,7 @@ var ThematicAttributeFilter = GlobalAttributeFilter.Extend(
 
 func (r *Renderer) renderThematicBreak(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		w.CloseTextBlock()
+		w.ForceCloseTextBlock()
 	}
 
 	return ast.WalkContinue, nil
@@ -527,7 +529,7 @@ func (r *Renderer) renderText(w blocksUtil.RWriter, source []byte, node ast.Node
 
 	r.Writer.Write(w, segment.Value(source))
 	if n.HardLineBreak() || (n.SoftLineBreak() && r.HardWraps) {
-		w.CloseTextBlock()
+		w.ForceCloseTextBlock()
 
 	} else if n.SoftLineBreak() {
 		w.AddTextToBuffer("\n")
