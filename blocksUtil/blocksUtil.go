@@ -21,6 +21,7 @@ type RWriter interface {
 	// Main part
 	GetText () string
 	AddTextToBuffer(s string)
+	AddTextByte (b []byte)
 
 	GetBlocks() []*model.Block
 
@@ -55,6 +56,10 @@ type rWriter struct {
 
 func (rw *rWriter) SetMarkStart () {
 	rw.marksStartQueue = append(rw.marksStartQueue, len(rw.textBuffer))
+}
+
+func (rw *rWriter) AddTextByte (b []byte) {
+	rw.textBuffer += string(b)
 }
 
 func (rw *rWriter) GetMarkStart () int {

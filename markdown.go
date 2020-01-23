@@ -4,10 +4,12 @@ package goldmark
 import (
 	"bufio"
 	"bytes"
-	htmlToMdConverter "gitea.com/lunny/html2md"
+	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"github.com/anytypeio/goldmark/blocksUtil"
+	htmlToMdConverter "github.com/anytypeio/html-to-markdown"
 	"io"
+	"log"
 
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -140,13 +142,20 @@ func (m *markdown) ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...p
 }
 
 func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
-	md := htmlToMdConverter.Convert(string(source))
+
+	converter := htmlToMdConverter.NewConverter("", true, nil)
+	md, err := converter.ConvertString(string(source))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var b bytes.Buffer
 	writer := bufio.NewWriter(&b)
 	BR := blocksUtil.NewRWriter(writer)
 
-	err := m.ConvertBlocks([]byte(md), BR)
+	fmt.Println("MD:::", md)
+
+	err = m.ConvertBlocks([]byte(md), BR)
 	if err != nil {
 		return err, nil
 	}

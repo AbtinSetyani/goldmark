@@ -596,11 +596,28 @@ func escapeRune(writer blocksUtil.RWriter, r rune) {
 }
 
 func (d *defaultWriter) RawWrite(writer blocksUtil.RWriter, source []byte) {
+/*	n := 0
+	l := len(source)
+	for i := 0; i < l; i++ {
+		v := util.EscapeHTMLByte(source[i])
+
+		//fmt.Println("char:", v[0])
+		if v != nil {
+			writer.AddTextByte(source[i-n : i])
+			n = 0
+			writer.AddTextByte(v)
+			continue
+		}
+		n++
+	}
+	if n != 0 {
+		writer.AddTextByte(source[l-n:])
+	}*/
 	writer.AddTextToBuffer(string(source))
 }
 
 func (d *defaultWriter) Write(writer blocksUtil.RWriter, source []byte) {
-	writer.AddTextToBuffer(string(source))
+	d.RawWrite(writer, source)
 }
 
 // DefaultWriter is a default implementation of the Writer.
