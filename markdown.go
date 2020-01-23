@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"github.com/anytypeio/goldmark/blocksUtil"
-	htmlToMdConverter "github.com/anytypeio/html-to-markdown"
+	"github.com/anytypeio/goldmark/spaceReplace"
+	"github.com/lunny/html2md"
 	"io"
-	"log"
+	"strings"
 
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
@@ -143,11 +144,17 @@ func (m *markdown) ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...p
 
 func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
 
-	converter := htmlToMdConverter.NewConverter("", true, nil)
+	md := html2md.Convert(string(source))
+	md = spaceReplace.WhitespaceNormalizeString(md)
+	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
+	md = strings.ReplaceAll(md, "\n", "")
+	md = strings.ReplaceAll(md, "@#par-mark$","\n\n")
+
+/*	converter := htmlToMdConverter.NewConverter("", true, nil)
 	md, err := converter.ConvertString(string(source))
 	if err != nil {
 		log.Fatal(err)
-	}
+	}*/
 
 	var b bytes.Buffer
 	writer := bufio.NewWriter(&b)
@@ -155,7 +162,7 @@ func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
 
 	fmt.Println("MD:::", md)
 
-	err = m.ConvertBlocks([]byte(md), BR)
+	err := m.ConvertBlocks([]byte(md), BR)
 	if err != nil {
 		return err, nil
 	}

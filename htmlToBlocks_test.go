@@ -5,15 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	htmlToMdConverter "github.com/anytypeio/html-to-markdown"
-	"log"
-
+	goldmark "github.com/anytypeio/goldmark"
 	"github.com/anytypeio/goldmark/blocksUtil"
+	htmlToMdConverter "github.com/anytypeio/html-to-markdown"
 	"io/ioutil"
+	"log"
 	"os/exec"
 	"testing"
-
-	goldmark "github.com/anytypeio/goldmark"
 )
 
 var (
@@ -79,15 +77,34 @@ func TestConvertHTMLToBlocks2(t *testing.T) {
 		panic(err)
 	}
 
-	//for i, c := range testCases {
-		mdToBlocksConverter := goldmark.New()
-		_, blocks := mdToBlocksConverter.HTMLToBlocks([]byte(testCases[3].HTML))
-		fmt.Println(1, "html:", testCases[3].HTML)
-		for i, b := range blocks {
-			fmt.Println(i," block: ", b)
+	s := testCases[4].HTML
+/*	asc := strings.Map(func(r rune) rune {
+		if r > unicode.MaxASCII {
+			return -1
 		}
+		return r
+	}, )*/
 
-	//}
+/*	re := regexp.MustCompile("[[:^ascii:]]")
+	reSpace := regexp.MustCompile(`[\s]+`)
+	//re2 := regexp.MustCompile("[[:^ascii:]]")
+	str := re.ReplaceAllLiteralString(s, "")
+	str = str*/
+
+/*	md := html2md.Convert(s)
+	md = spaceReplace.WhitespaceNormalizeString(md)
+	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
+	md = strings.ReplaceAll(md, "\n", "")
+	md = strings.ReplaceAll(md, "@#par-mark$","\n\n")
+	fmt.Println(md)*/
+
+	mdToBlocksConverter := goldmark.New()
+	_, blocks := mdToBlocksConverter.HTMLToBlocks([]byte(s))
+	fmt.Println(1, "html:", testCases[4].HTML)
+	for i, b := range blocks {
+		fmt.Println(i," block: ", b)
+	}
+
 }
 
 func convertToBlocksAndPrint (html string) error {
