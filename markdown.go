@@ -4,6 +4,7 @@ package goldmark
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/parser"
@@ -14,6 +15,7 @@ import (
 	"github.com/anytypeio/goldmark/util"
 	"github.com/lunny/html2md"
 	"io"
+	"regexp"
 	"strings"
 )
 
@@ -145,9 +147,19 @@ func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
 	preprocessedSource := string(source)
 	// special wiki spaces
 	preprocessedSource = strings.ReplaceAll(preprocessedSource, "<span> </span>", " ")
+
 	md := html2md.Convert(preprocessedSource)
 
 	md = spaceReplace.WhitespaceNormalizeString(md)
+
+	// Pattern: <a href> <div style=background-image:...>  </div> <a>
+
+	md = strings.ReplaceAll(md, "[\n\n]", "[]")
+
+	re := regexp.MustCompile(`\[\]\(([\s\S]*?)\)`)
+	md = re.ReplaceAllString(md, `[$1]($1)`)
+
+	fmt.Println("MD:", md)
 /*	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
 	md = strings.ReplaceAll(md, "\n", "")
 	md = strings.ReplaceAll(md, "@#par-mark$","\n\n")*/

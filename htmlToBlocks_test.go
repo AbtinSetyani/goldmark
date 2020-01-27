@@ -61,7 +61,7 @@ func TestConvertHTMLToBlocks2(t *testing.T) {
 		panic(err)
 	}
 
-	testNum := 8
+	testNum := 9
 	s := testCases[testNum].HTML
 
 	mdToBlocksConverter := goldmark.New()
