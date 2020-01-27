@@ -149,12 +149,15 @@ func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
 	preprocessedSource = strings.ReplaceAll(preprocessedSource, "<span> </span>", " ")
 
 	md := html2md.Convert(preprocessedSource)
-
 	md = spaceReplace.WhitespaceNormalizeString(md)
+
+	reLinkBreaks := regexp.MustCompile(`\[[\s]*?([\s\S])[\s]*?\]\(([\s\S]*?)\)`)
+	md = reLinkBreaks.ReplaceAllString(md, `[$1]($2)`)
 
 	// Pattern: <a href> <div style=background-image:...>  </div> <a>
 	reEmptyLinkText := regexp.MustCompile(`\[[\s]*?\]\(([\s\S]*?)\)`)
 	md = reEmptyLinkText.ReplaceAllString(md, `[$1]($1)`)
+
 
 	fmt.Println("MD:", md)
 /*	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
