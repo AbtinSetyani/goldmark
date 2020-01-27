@@ -6,16 +6,15 @@ import (
 	"bytes"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"github.com/anytypeio/goldmark/blocksUtil"
-	"github.com/anytypeio/goldmark/spaceReplace"
-	"github.com/lunny/html2md"
-	"io"
-	"strings"
-
 	"github.com/anytypeio/goldmark/parser"
 	"github.com/anytypeio/goldmark/renderer"
 	"github.com/anytypeio/goldmark/renderer/html"
+	"github.com/anytypeio/goldmark/spaceReplace"
 	"github.com/anytypeio/goldmark/text"
 	"github.com/anytypeio/goldmark/util"
+	"github.com/lunny/html2md"
+	"io"
+	"strings"
 )
 
 // DefaultParser returns a new Parser that is configured by default values.
@@ -143,11 +142,15 @@ func (m *markdown) ConvertBlocks(source []byte, BR blocksUtil.RWriter, opts ...p
 
 func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
 
-	md := html2md.Convert(string(source))
+	preprocessedSource := string(source)
+	// special wiki spaces
+	preprocessedSource = strings.ReplaceAll(preprocessedSource, "<span> </span>", " ")
+	md := html2md.Convert(preprocessedSource)
+
 	md = spaceReplace.WhitespaceNormalizeString(md)
-	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
+/*	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
 	md = strings.ReplaceAll(md, "\n", "")
-	md = strings.ReplaceAll(md, "@#par-mark$","\n\n")
+	md = strings.ReplaceAll(md, "@#par-mark$","\n\n")*/
 
 /*	converter := htmlToMdConverter.NewConverter("", true, nil)
 	md, err := converter.ConvertString(string(source))

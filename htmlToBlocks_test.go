@@ -49,22 +49,6 @@ func TestConvertHTMLToBlocks(t *testing.T) {
 	for _, c := range testCases {
 		convertToBlocksAndPrint(c.HTML)
 	}
-/*	cases := []testutil.MarkdownTestCase{}
-	for _, c := range testCases {
-		cases = append(cases, testutil.MarkdownBlockTestCase{
-			HTML: c.HTML,
-		})
-	}
-	markdown := New(WithRendererOptions(
-		html.WithXHTML(),
-		html.WithUnsafe(),
-	))
-	testutil.DoTestCases(markdown, cases, t)	*/
-
-
-	//sample1 := "<body><h1>My First Heading</h1><p>My first paragraph.</p></body>"
-
-	//convertToBlocksAndPrint(sample1)
 }
 
 func TestConvertHTMLToBlocks2(t *testing.T) {
@@ -77,30 +61,12 @@ func TestConvertHTMLToBlocks2(t *testing.T) {
 		panic(err)
 	}
 
-	s := testCases[4].HTML
-/*	asc := strings.Map(func(r rune) rune {
-		if r > unicode.MaxASCII {
-			return -1
-		}
-		return r
-	}, )*/
-
-/*	re := regexp.MustCompile("[[:^ascii:]]")
-	reSpace := regexp.MustCompile(`[\s]+`)
-	//re2 := regexp.MustCompile("[[:^ascii:]]")
-	str := re.ReplaceAllLiteralString(s, "")
-	str = str*/
-
-/*	md := html2md.Convert(s)
-	md = spaceReplace.WhitespaceNormalizeString(md)
-	md = strings.ReplaceAll(md, "\n\n\n", "@#par-mark$")
-	md = strings.ReplaceAll(md, "\n", "")
-	md = strings.ReplaceAll(md, "@#par-mark$","\n\n")
-	fmt.Println(md)*/
+	testNum := 6
+	s := testCases[testNum].HTML
 
 	mdToBlocksConverter := goldmark.New()
 	_, blocks := mdToBlocksConverter.HTMLToBlocks([]byte(s))
-	fmt.Println(1, "html:", testCases[4].HTML)
+	fmt.Println("html:", testCases[testNum].HTML)
 	for i, b := range blocks {
 		fmt.Println(i," block: ", b)
 	}

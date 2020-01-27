@@ -3,6 +3,7 @@ package blocksUtil
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"io"
 )
@@ -124,6 +125,7 @@ func (rw *rWriter) AddImageBlock (url string) {
 }
 
 func (rw *rWriter) CloseTextBlock(content model.BlockContentTextStyle) {
+	fmt.Println("CLOSE:", content)
 	var style = content;
 
 	if len(rw.textStylesQueue) > 0 {

@@ -314,8 +314,6 @@ func (r *Renderer) renderListItem(w blocksUtil.RWriter, source []byte, n ast.Nod
 	if entering {
 		w.OpenNewTextBlock(tag)
 	} else {
-
-
 		w.CloseTextBlock(tag)
 	}
 	return ast.WalkContinue, nil
@@ -336,7 +334,7 @@ func (r *Renderer) renderParagraph(w blocksUtil.RWriter, source []byte, n ast.No
 func (r *Renderer) renderTextBlock(w blocksUtil.RWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		// TODO: check it
-		w.CloseTextBlock(model.BlockContentText_Paragraph)
+		//w.CloseTextBlock(model.BlockContentText_Paragraph)
 	}
 	return ast.WalkContinue, nil
 }
