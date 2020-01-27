@@ -506,7 +506,7 @@ func (r *Renderer) renderText(w blocksUtil.RWriter, source []byte, node ast.Node
 		w.ForceCloseTextBlock()
 
 	} else if n.SoftLineBreak() {
-		w.AddTextToBuffer("\n")
+		//w.AddTextToBuffer("\n")
 	}
 	return ast.WalkContinue, nil
 }

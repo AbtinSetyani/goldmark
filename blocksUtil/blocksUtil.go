@@ -115,7 +115,7 @@ func (rw *rWriter) AddImageBlock (url string) {
 	newBlock := model.Block{
 		Content: &model.BlockContentOfFile{
 			File: &model.BlockContentFile{
-				//PreviewFilePath: url,
+				Name: url,
 				State: model.BlockContentFile_Uploading,
 				Type: model.BlockContentFile_Image,
 		}},
