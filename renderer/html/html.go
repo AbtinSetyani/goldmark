@@ -448,14 +448,8 @@ func (r *Renderer) renderEmphasis(w blocksUtil.RWriter, source []byte, node ast.
 
 func (r *Renderer) renderLink(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
-	//link := ""
 	if entering {
 		w.SetMarkStart()
-
-/*		if r.Unsafe || !IsDangerousURL(n.Destination) {
-			link = string(util.EscapeHTML(util.URLEscape(n.Destination, true)))
-		}*/
-
 	} else {
 		to := int32(len(w.GetText()))
 
@@ -487,31 +481,13 @@ var ImageAttributeFilter = GlobalAttributeFilter.Extend(
 )
 
 func (r *Renderer) renderImage(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	// TODO
-	/*	if !entering {
+	if !entering {
 		return ast.WalkContinue, nil
 	}
+
 	n := node.(*ast.Image)
-	_, _ = w.WriteString("<img src=\"")
-	if r.Unsafe || !IsDangerousURL(n.Destination) {
-		_, _ = w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
-	}
-	_, _ = w.WriteString(`" alt="`)
-	_, _ = w.Write(n.Text(source))
-	_ = w.WriteByte('"')
-	if n.Title != nil {
-		_, _ = w.WriteString(` title="`)
-		r.Writer.Write(w, n.Title)
-		_ = w.WriteByte('"')
-	}
-	if n.Attributes() != nil {
-		RenderAttributes(w, n, ImageAttributeFilter)
-	}
-	if r.XHTML {
-		_, _ = w.WriteString(" />")
-	} else {
-		_, _ = w.WriteString(">")
-	}*/
+	w.AddImageBlock(string(n.Destination))
+
 	return ast.WalkSkipChildren, nil
 }
 

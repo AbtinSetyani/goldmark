@@ -30,6 +30,7 @@ type RWriter interface {
 
 	AddMark (mark model.BlockContentTextMark)
 
+	AddImageBlock (url string)
 	OpenNewTextBlock (model.BlockContentTextStyle)
 	CloseTextBlock(model.BlockContentTextStyle)
 	ForceCloseTextBlock()
@@ -107,6 +108,19 @@ func (rw *rWriter) GetText () string {
 
 func (rw *rWriter) AddTextToBuffer (text string) {
 	rw.textBuffer += text
+}
+
+func (rw *rWriter) AddImageBlock (url string) {
+	newBlock := model.Block{
+		Content: &model.BlockContentOfFile{
+			File: &model.BlockContentFile{
+				State: model.BlockContentFile_Uploading,
+				Type: model.BlockContentFile_Image,
+				LocalFilePath: url,
+		}},
+	}
+
+	rw.blocks = append(rw.blocks, &newBlock)
 }
 
 func (rw *rWriter) CloseTextBlock(content model.BlockContentTextStyle) {
