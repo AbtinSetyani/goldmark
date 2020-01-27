@@ -448,13 +448,13 @@ func (r *Renderer) renderEmphasis(w blocksUtil.RWriter, source []byte, node ast.
 
 func (r *Renderer) renderLink(w blocksUtil.RWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.Link)
-	link := ""
+	//link := ""
 	if entering {
 		w.SetMarkStart()
 
-		if r.Unsafe || !IsDangerousURL(n.Destination) {
+/*		if r.Unsafe || !IsDangerousURL(n.Destination) {
 			link = string(util.EscapeHTML(util.URLEscape(n.Destination, true)))
-		}
+		}*/
 
 	} else {
 		to := int32(len(w.GetText()))
@@ -462,7 +462,7 @@ func (r *Renderer) renderLink(w blocksUtil.RWriter, source []byte, node ast.Node
 		w.AddMark(model.BlockContentTextMark{
 			Range: &model.Range{ From:int32(w.GetMarkStart()), To:to },
 			Type: model.BlockContentTextMark_Link,
-			Param: link,
+			Param: string(n.Destination),
 		})
 	}
 	return ast.WalkContinue, nil

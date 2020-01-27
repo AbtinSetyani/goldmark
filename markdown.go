@@ -4,7 +4,6 @@ package goldmark
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"github.com/anytypeio/goldmark/blocksUtil"
 	"github.com/anytypeio/goldmark/spaceReplace"
@@ -160,7 +159,7 @@ func (m *markdown) HTMLToBlocks(source []byte) (error, []*model.Block) {
 	writer := bufio.NewWriter(&b)
 	BR := blocksUtil.NewRWriter(writer)
 
-	fmt.Println("MD:::", md)
+	//fmt.Println("MD:::", md)
 
 	err := m.ConvertBlocks([]byte(md), BR)
 	if err != nil {
