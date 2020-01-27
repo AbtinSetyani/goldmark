@@ -3,7 +3,6 @@ package blocksUtil
 
 import (
 	"bufio"
-	"fmt"
 	"github.com/anytypeio/go-anytype-library/pb/model"
 	"io"
 )
@@ -84,6 +83,7 @@ func (rw *rWriter) AddMark (mark model.BlockContentTextMark) {
 }
 
 func (rw *rWriter) OpenNewTextBlock (style model.BlockContentTextStyle) {
+	//fmt.Println("OPEN:", style)
 	rw.textStylesQueue = append(rw.textStylesQueue, style)
 }
 
@@ -125,12 +125,14 @@ func (rw *rWriter) AddImageBlock (url string) {
 }
 
 func (rw *rWriter) CloseTextBlock(content model.BlockContentTextStyle) {
-	fmt.Println("CLOSE:", content)
+	//fmt.Println("CLOSE:", content, rw.textBuffer)
 	var style = content;
 
 	if len(rw.textStylesQueue) > 0 {
+		if rw.textStylesQueue[len(rw.textStylesQueue)-1] != content { return }
 		rw.textStylesQueue = rw.textStylesQueue[:len(rw.textStylesQueue)-1]
 	}
+
 	//style = model.BlockContentText_Paragraph
 	newBlock := model.Block{
 		Content: &model.BlockContentOfText{

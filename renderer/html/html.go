@@ -227,6 +227,7 @@ func (r *Renderer) renderHeading(w blocksUtil.RWriter, source []byte, node ast.N
 	n := node.(*ast.Heading)
 
 	var style model.BlockContentTextStyle;
+	//fmt.Println("LVL:", n.Level)
 	switch n.Level {
 	case 1: style = model.BlockContentText_Header1
 	case 2: style = model.BlockContentText_Header2
